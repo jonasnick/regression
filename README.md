@@ -1,4 +1,4 @@
 regression
 ==========
 
-paper and presentation of my machine learning seminar
+Presentation about regression models: Least squares, maximum likelihood, bayes
