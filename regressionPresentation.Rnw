@@ -16,10 +16,10 @@ options(width=60)
 options(continue=" ")
 source("regressionFunctions.R")
 @
-\begin{frame}[fragile]{Regression: Least-squares, Maximum Likelihood und Bayes}
-\begin{small}
-\end{small}
+\begin{frame}[fragile]{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
+\tableofcontents
 \end{frame}
+\section{Dataset}
 \begin{frame}[fragile]{Dataset}
 \begin{small}
 <<loadProfitData>>=
@@ -63,7 +63,8 @@ abline(model)
 \end{figure}
 \end{small}
 \end{frame}
-\begin{frame}{Hypothese}
+\section{Lineare Regression: Hypothese}
+\begin{frame}{Lineare Regression: Hypothese}
 \begin{small}
 \[
 x = \begin{bmatrix} x_0\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n+1}, \theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
@@ -77,6 +78,7 @@ h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
 
 \end{small}
 \end{frame}
+\section{Least Squares: Kostenfunktion}
 \begin{frame}{Kostenfunktion}
 \begin{small}
 \[
@@ -88,18 +90,21 @@ J(\theta_0,\theta_1) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
 \end{small}
 \end{frame}
 
+\section{Gradientenverfahren}
 \begin{frame}{Gradientenverfahren}
 \begin{small}
-
+picture: gradient descent
 \end{small}
 \end{frame}
 \begin{frame}{Analytische Lösung}
 \begin{small}
-
+möglich, aber wesentlich langsamer für große daten 
+lineare regression hat eh nur ein minimum
 \end{small}
 \end{frame}
 
-\begin{frame}{Polynomielle regression}
+\section{Polynomielle Regression}
+\begin{frame}{Polynomielle Regression}
 \begin{small}
 \[
 h_\theta=\theta_0 + \theta_1x + \theta_2x^2 + \theta_3\sqrt{x}
@@ -108,13 +113,18 @@ h_\theta=\theta_0 + \theta_1x + \theta_2x^2 + \theta_3\sqrt{x}
 \end{small}
 \end{frame}
 
+\section{Logistische Regression}
 \begin{frame}[fragile]{Logistische Regression}
-\begin{small}
-<<loadTitanicData,echo=FALSE>>=
-titanicData <- read.csv(file="titanicTrain.csv", 
-                head=TRUE,sep=",")
+<<loadAdmissionData,echo=FALSE>>=
+admissionData <- read.table("admissionData.txt",header=TRUE,sep=",")
+admissionData$admitted <- as.factor(admissionData$admitted)
 @
-\end{small}
+<<sigmoidFunction, fig=true, echo=false, include=false,width=4,height=4>>=
+par(cex.lab=1.2)
+plot(g, xlim=c(-5,5))
+@
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
 \[
 y\in\left\{{0,1,2,\dots,n}\right\}
 \]
@@ -122,33 +132,94 @@ y\in\left\{{0,1,2,\dots,n}\right\}
 h_\theta(x) = g(\theta^Tx)
 \]
 \[
-g(z) = \frac{1}{1+e^{-z}}
-\]
-\end{frame}
-
-\begin{frame}[fragile]{Logistische Regression: Kostenfunktion}
-\begin{small}
-<<sigmoidFunction, fig=true, echo=false, include=false,width=6,height=4>>=
-plot(g, xlim=c(-5,5))
-@
+g(z) = \frac{1}{1+e^{-z}}\]
+\end{column}
+\begin{column}{.5\textwidth}
 \begin{figure}[tbp]
 \centering
-\includegraphics{regressionPresentation-sigmoidFunction}
+\includegraphics[width=1.0\textwidth]{regressionPresentation-sigmoidFunction}
+\end{figure}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Logistische Regression: Decision Boundary}
+\begin{frame}[fragile]{Logistische Regression: Decision Boundary}
+\begin{small}
+<<admissionDataGLM, fig=true, echo=false, include=false,width=3,height=3>>=
+mdl <- glm(admitted~exam1+exam2,data=admissionData,family="binomial")
+slope <- coef(mdl)[2]/(-coef(mdl)[3])
+intercept <- coef(mdl)[1]/(-coef(mdl)[3])
+library(lattice)
+xyplot(exam1 ~ exam2, data=admissionData, groups=admitted, 
+            panel=function(...) {
+                panel.xyplot(...)
+                panel.abline(intercept,slope)
+                panel.grid(...)
+                })
+@
+%<<glmSummary,echo=false>>=
+%summary(mdl)
+%@
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.5\textwidth]{regressionPresentation-admissionDataGLM}
 \end{figure}
 
 \end{small}
 \end{frame}
 
-\begin{frame}[fragile]{Maximum Likelihood Estimation}
+\section{Logistische Regression: Kostenfunktion}
+\begin{frame}[fragile]{Logistische Regression: Kostenfunktion}
 \begin{small}
 \[
-P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
+J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)})
+\]
+\begin{equation*}
+Cost(h_\theta(x),y) = \begin{cases}
+                        -\log(h_\theta(x))      & if\:y = 1\\
+                        -\log(1-h_\theta(x))    & if\:y = 0 \\
+                    \end{cases}
+\end{equation*}
+\end{small}
+\end{frame}
+
+\section{Regularisierung}
+\begin{frame}[fragile]{Regularisierung}
+\begin{small}
+picture: overfitting
+\[
+J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)}) + \frac{\lambda}{2m}\sum_{j=1}^{n}\theta_j^2
 \]
 \end{small}
 \end{frame}
 
+\section{Maximum Likelihood Schätzer}
+\begin{frame}[fragile]{Maximum Likelihood Schätzer}
+\begin{small}
+MLE is identical to OLS under the normality assumption for the error terms.
+\[
+P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
+\]
+f: Wahrscheinlichkeitsfunktion
+\[
+L(\theta) = f(x|\theta)
+\]
+\[
+L(\hat{\theta}) = \underset{\theta}{\operatorname{argmax}} L(\theta)
+\]
+then it is an optimizing problem
+\end{small}
+\end{frame}
+
+\section{Bayes'sche Lineare Regression}
 \begin{frame}[fragile]{Bayes'sche Lineare Regression}
 \begin{small}
+coincides with maximum likelihood given a uniform prior distribution
+data is supplemented with additional information in the form of a prior probability distribution.
+\[
+gegeben:\:f(x|\theta), L(\theta), f(\theta)
+\]
 \[
 P(\theta) \sim \mathcal{N}(\mu_0,S_0)
 \]
@@ -159,6 +230,7 @@ P(\theta|y) \sim \mathcal{N}(\mu,S)
 \end{small}
 \end{frame}
 
+\section{Anwendung}
 \begin{frame}{Anwendung}
 Phylogenetic Trees: wikipedia
 \end{frame}
