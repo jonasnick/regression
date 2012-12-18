@@ -8,11 +8,13 @@
 \documentclass {beamer}
 \usetheme{Rochester}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
 \begin{document}
 %Shortens output lines
 <<echo=false>>=
 options(width=60)
 options(continue=" ")
+source("regressionFunctions.R")
 @
 \begin{frame}[fragile]{Regression: Least-squares, Maximum Likelihood und Bayes}
 \begin{small}
@@ -61,7 +63,105 @@ abline(model)
 \end{figure}
 \end{small}
 \end{frame}
+\begin{frame}{Hypothese}
+\begin{small}
+\[
+x = \begin{bmatrix} x_0\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n+1}, \theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
+\]
+\[
+h_\theta(x)=\theta^Tx
+\]
+\[
+h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
+\]
 
+\end{small}
+\end{frame}
+\begin{frame}{Kostenfunktion}
+\begin{small}
+\[
+J(\theta_0,\theta_1) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
+\]
+\[
+\underset{\theta_0,\theta_1}{\operatorname{argmin}} J(\theta_0,\theta_1)
+\]
+\end{small}
+\end{frame}
+
+\begin{frame}{Gradientenverfahren}
+\begin{small}
+
+\end{small}
+\end{frame}
+\begin{frame}{Analytische Lösung}
+\begin{small}
+
+\end{small}
+\end{frame}
+
+\begin{frame}{Polynomielle regression}
+\begin{small}
+\[
+h_\theta=\theta_0 + \theta_1x + \theta_2x^2 + \theta_3\sqrt{x}
+\]
+
+\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{Logistische Regression}
+\begin{small}
+<<loadTitanicData,echo=FALSE>>=
+titanicData <- read.csv(file="titanicTrain.csv", 
+                head=TRUE,sep=",")
+@
+\end{small}
+\[
+y\in\left\{{0,1,2,\dots,n}\right\}
+\]
+\[
+h_\theta(x) = g(\theta^Tx)
+\]
+\[
+g(z) = \frac{1}{1+e^{-z}}
+\]
+\end{frame}
+
+\begin{frame}[fragile]{Logistische Regression: Kostenfunktion}
+\begin{small}
+<<sigmoidFunction, fig=true, echo=false, include=false,width=6,height=4>>=
+plot(g, xlim=c(-5,5))
+@
+\begin{figure}[tbp]
+\centering
+\includegraphics{regressionPresentation-sigmoidFunction}
+\end{figure}
+
+\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{Maximum Likelihood Estimation}
+\begin{small}
+\[
+P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
+\]
+\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{Bayes'sche Lineare Regression}
+\begin{small}
+\[
+P(\theta) \sim \mathcal{N}(\mu_0,S_0)
+\]
+\[
+P(\theta|y) \sim \mathcal{N}(\mu,S)
+\]
+
+\end{small}
+\end{frame}
+
+\begin{frame}{Anwendung}
+Phylogenetic Trees: wikipedia
+\end{frame}
 \begin{frame}
 A displayed formula:
 \[
@@ -82,18 +182,5 @@ An itemized list:
 \end{theorem}
 
 \end{frame}
-\begin{frame}[fragile]{Logistic Regression}
-\begin{small}
-<<loadTitanicData>>=
-titanicData <- read.csv(file="titanicTrain.csv", 
-                head=TRUE,sep=",")
-@
-\end{small}
-survived,pclass,name,sex,age,sibsp,parch,ticket,fare,cabin,embarked
-0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
 
-\end{frame}
-\begin{frame}{Applications}
-Phylogenetic Trees: wikipedia
-\end{frame}
 \end{document}
