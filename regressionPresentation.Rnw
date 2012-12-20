@@ -5,7 +5,7 @@
 %\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
 %\fvset{listparameters={\setlength{\topsep}{0pt}}}
 %\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
-\documentclass {beamer}
+\documentclass{beamer}
 \usetheme{Rochester}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -146,8 +146,11 @@ g(z) = \frac{1}{1+e^{-z}}\]
 \section{Logistische Regression: Decision Boundary}
 \begin{frame}[fragile]{Logistische Regression: Decision Boundary}
 \begin{small}
+<<admissionModel>>=
+mdl <- glm(admitted~exam1+exam2,data=admissionData,
+            family="binomial")
+@
 <<admissionDataGLM, fig=true, echo=false, include=false,width=3,height=3>>=
-mdl <- glm(admitted~exam1+exam2,data=admissionData,family="binomial")
 slope <- coef(mdl)[2]/(-coef(mdl)[3])
 intercept <- coef(mdl)[1]/(-coef(mdl)[3])
 library(lattice)
@@ -169,7 +172,7 @@ xyplot(exam1 ~ exam2, data=admissionData, groups=admitted,
 \end{small}
 \end{frame}
 
-\section{Logistische Regression: Kostenfunktion}
+\section{Logistische Regression: udostenfunktion}
 \begin{frame}[fragile]{Logistische Regression: Kostenfunktion}
 \begin{small}
 \[
