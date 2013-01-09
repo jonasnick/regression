@@ -6,7 +6,7 @@
 %\fvset{listparameters={\setlength{\topsep}{0pt}}}
 %\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
 \documentclass{beamer}
-\usetheme{Rochester}
+\usetheme{Darmstadt}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \begin{document}
@@ -19,30 +19,46 @@ source("regressionFunctions.R")
 \begin{frame}[fragile]{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
 \tableofcontents
 \end{frame}
-\section{Dataset}
-\begin{frame}[fragile]{Dataset}
+\section{Problembeschreibung}
+\begin{frame}[fragile]{Problembeschreibung}
 \begin{small}
-<<loadProfitData>>=
+\[
+x = \begin{bmatrix} 1\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n}
+y \in \mathbb{R}
+\]
+
+\begin{block}{Regression}
+\[
+y = h(x) + \epsilon
+\]
+\end{block}
+
+\end{small}
+\end{frame}
+\section{Regressionsverfahren}
+\subsection{Lineare Regression}
+\begin{frame}{Lineare Regression}
+\begin{small}
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+\[
+\theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
+\]
+\[
+h_\theta(x)=\theta^Tx
+\]
+\[
+h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
+\]
+\end{column}
+\begin{column}{.5\textwidth}
+<<loadProfitData, echo=false>>=
 profitData <- read.table("ex1data2.txt", 
                             header=TRUE, sep=",")
-head(profitData)
-nrow(profitData)
 @
-\end{small}
-\end{frame}
-\begin{frame}[fragile]{Dataset}
-\begin{small}
-<<displayProfitData, fig=true, echo=false>>=
-#lines(density(profitData$price))
-#head(profitData$price)
-#hist(profitData$price, breaks=10,prob=T)
-pairs(profitData[,c(1,2,3)])
-#plot(1:10)
+<<displayHead, echo=false>>=
+#head(profitData)
 @
-\end{small}
-\end{frame}
-\begin{frame}[fragile]{Dataset}
-\begin{small}
 <<displayProfitData2, fig=true, echo=false, include=false,width=6,height=4>>=
 #lines(density(profitData$price))
 #head(profitData$price)
@@ -59,51 +75,14 @@ abline(model)
 @
 \begin{figure}[tbp]
 \centering
-\includegraphics{regressionPresentation-displayProfitData2}
+\includegraphics[height=45mm, width=60mm]{regressionPresentation-displayProfitData2}
 \end{figure}
-\end{small}
-\end{frame}
-\section{Lineare Regression: Hypothese}
-\begin{frame}{Lineare Regression: Hypothese}
-\begin{small}
-\[
-x = \begin{bmatrix} x_0\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n+1}, \theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
-\]
-\[
-h_\theta(x)=\theta^Tx
-\]
-\[
-h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
-\]
-
-\end{small}
-\end{frame}
-\section{Least Squares: Kostenfunktion}
-\begin{frame}{Kostenfunktion}
-\begin{small}
-\[
-J(\theta_0,\theta_1) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
-\]
-\[
-\underset{\theta_0,\theta_1}{\operatorname{argmin}} J(\theta_0,\theta_1)
-\]
+\end{column}
+\end{columns}
 \end{small}
 \end{frame}
 
-\section{Gradientenverfahren}
-\begin{frame}{Gradientenverfahren}
-\begin{small}
-picture: gradient descent
-\end{small}
-\end{frame}
-\begin{frame}{Analytische Lösung}
-\begin{small}
-möglich, aber wesentlich langsamer für große daten 
-lineare regression hat eh nur ein minimum
-\end{small}
-\end{frame}
-
-\section{Polynomielle Regression}
+\subsection{Polynomielle Regression}
 \begin{frame}{Polynomielle Regression}
 \begin{small}
 \[
@@ -113,7 +92,7 @@ h_\theta=\theta_0 + \theta_1x + \theta_2x^2 + \theta_3\sqrt{x}
 \end{small}
 \end{frame}
 
-\section{Logistische Regression}
+\subsection{Logistische Regression}
 \begin{frame}[fragile]{Logistische Regression}
 <<loadAdmissionData,echo=FALSE>>=
 admissionData <- read.table("admissionData.txt",header=TRUE,sep=",")
@@ -137,16 +116,8 @@ g(z) = \frac{1}{1+e^{-z}}\]
 \begin{column}{.5\textwidth}
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=1.0\textwidth]{regressionPresentation-sigmoidFunction}
-\end{figure}
-\end{column}
-\end{columns}
-\end{frame}
-
-\section{Logistische Regression: Decision Boundary}
-\begin{frame}[fragile]{Logistische Regression: Decision Boundary}
-\begin{small}
-<<admissionModel>>=
+\includegraphics[width=0.6\textwidth]{regressionPresentation-sigmoidFunction}
+<<admissionModel, echo=false>>=
 mdl <- glm(admitted~exam1+exam2,data=admissionData,
             family="binomial")
 @
@@ -161,20 +132,66 @@ xyplot(exam1 ~ exam2, data=admissionData, groups=admitted,
                 panel.grid(...)
                 })
 @
-%<<glmSummary,echo=false>>=
-%summary(mdl)
-%@
+<<glmSummary,echo=false>>=
+#summary(mdl)
+@
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.5\textwidth]{regressionPresentation-admissionDataGLM}
+\includegraphics[width=0.6\textwidth]{regressionPresentation-admissionDataGLM}
 \end{figure}
 
+\end{figure}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Parameterschätzung}
+\begin{frame}{Parameterschätzung}
+\begin{small}
+\[
+X = \begin{bmatrix} -x^{1^{T}}-\\-x^{2^{T}}-\\\vdots\\-x^{m^{T}}- \end{bmatrix} \in \mathbb{R}^{mxn}
+\]
+\begin{block}{Kostenfunktion}
+\[
+\underset{\theta}{\operatorname{argmin}} J(\theta, X)
+\]
+\end{block}
 \end{small}
 \end{frame}
 
-\section{Logistische Regression: udostenfunktion}
-\begin{frame}[fragile]{Logistische Regression: Kostenfunktion}
+\subsection{Kleinste Quadrate}
+\begin{frame}{Kleinste Quadrate}
 \begin{small}
+nimmt als Prior Normalverteilung des Fehlers an
+\begin{block}{Kleinste Quadrate: Polynomielle Regression}
+\[
+J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{i})- y^{i})^2
+\]
+\end{block}
+\end{small}
+\end{frame}
+
+\begin{frame}{Normalengleichung}
+\begin{small}
+\[
+\theta=(X^TX)^{-1}X^Ty
+\]
+%möglich, aber wesentlich langsamer für große daten 
+%lineare regression hat eh nur ein minimum
+\end{small}
+\end{frame}
+
+\subsection{Gradientenverfahren}
+\begin{frame}{Gradientenverfahren}
+\begin{small}
+picture: gradient descent
+\end{small}
+\end{frame}
+
+\subsection{Logistische Regression}
+\begin{frame}[fragile]{Logistische Regression}
+\begin{small}
+\begin{block}{Logistische Regression}
 \[
 J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)})
 \]
@@ -184,36 +201,61 @@ Cost(h_\theta(x),y) = \begin{cases}
                         -\log(1-h_\theta(x))    & if\:y = 0 \\
                     \end{cases}
 \end{equation*}
+\end{block}
 \end{small}
 \end{frame}
 
-\section{Regularisierung}
-\begin{frame}[fragile]{Regularisierung}
-\begin{small}
-picture: overfitting
-\[
-J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)}) + \frac{\lambda}{2m}\sum_{j=1}^{n}\theta_j^2
-\]
-\end{small}
-\end{frame}
 
-\section{Maximum Likelihood Schätzer}
-\begin{frame}[fragile]{Maximum Likelihood Schätzer}
-\begin{small}
-MLE is identical to OLS under the normality assumption for the error terms.
-\[
-P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
-\]
-f: Wahrscheinlichkeitsfunktion
-\[
-L(\theta) = f(x|\theta)
-\]
-\[
-L(\hat{\theta}) = \underset{\theta}{\operatorname{argmax}} L(\theta)
-\]
-then it is an optimizing problem
-\end{small}
-\end{frame}
+
+
+%\section{Logistische Regression: Decision Boundary}
+%\begin{frame}[fragile]{Logistische Regression: Decision Boundary}
+%\begin{small}
+%<<admissionModel>>=
+%mdl <- glm(admitted~exam1+exam2,data=admissionData,
+%            family="binomial")
+%@
+%<<admissionDataGLM, fig=true, echo=false, include=false,width=3,height=3>>=
+%slope <- coef(mdl)[2]/(-coef(mdl)[3])
+%intercept <- coef(mdl)[1]/(-coef(mdl)[3])
+%library(lattice)
+%xyplot(exam1 ~ exam2, data=admissionData, groups=admitted, 
+%            panel=function(...) {
+%                panel.xyplot(...)
+%                panel.abline(intercept,slope)
+%                panel.grid(...)
+%                })
+%@
+%<<glmSummary,echo=false>>=
+%summary(mdl)
+%@
+%\begin{figure}[tbp]
+%\centering
+%\includegraphics[width=0.5\textwidth]{regressionPresentation-admissionDataGLM}
+%\end{figure}
+%
+%\end{small}
+%\end{frame}
+
+
+
+%\section{Maximum Likelihood Schätzer}
+%\begin{frame}[fragile]{Maximum Likelihood Schätzer}
+%\begin{small}
+%MLE is identical to OLS under the normality assumption for the error terms.
+%\[
+%P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
+%\]
+%f: Wahrscheinlichkeitsfunktion
+%\[
+%L(\theta) = f(x|\theta)
+%\]
+%\[
+%L(\hat{\theta}) = \underset{\theta}{\operatorname{argmax}} L(\theta)
+%\]
+%then it is an optimizing problem
+%\end{small}
+%\end{frame}
 
 \section{Bayes'sche Lineare Regression}
 \begin{frame}[fragile]{Bayes'sche Lineare Regression}
@@ -250,7 +292,9 @@ An itemized list:
   \item itemized item 2
   \item itemized item 3
 \end{itemize}
-
+\begin{block}{Regression}
+test
+\end{block}
 \begin{theorem}
   In a right triangle, the square of hypotenuse equals
   the sum of squares of two other sides.
