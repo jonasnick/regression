@@ -9,6 +9,13 @@
 \usetheme{Darmstadt}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+
+\title{Lineare Regression}
+\subtitle{Kleinste Quadrate, Maximum Likelihood und Bayes}
+\author{Jonas Nick}
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[frame number]
+
 \begin{document}
 %Shortens output lines
 <<echo=false>>=
@@ -16,42 +23,8 @@ options(width=60)
 options(continue=" ")
 source("regressionFunctions.R")
 @
-\begin{frame}[fragile]{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
-\tableofcontents
-\end{frame}
-\section{Problembeschreibung}
-\begin{frame}[fragile]{Problembeschreibung}
-\begin{small}
-\[
-x = \begin{bmatrix} 1\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n}
-y \in \mathbb{R}
-\]
-
-\begin{block}{Regression}
-\[
-y = h(x) + \epsilon
-\]
-\end{block}
-
-\end{small}
-\end{frame}
-\section{Regressionsverfahren}
-\subsection{Lineare Regression}
-\begin{frame}{Lineare Regression}
-\begin{small}
-\begin{columns}[T]
-\begin{column}{.5\textwidth}
-\[
-\theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
-\]
-\[
-h_\theta(x)=\theta^Tx
-\]
-\[
-h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
-\]
-\end{column}
-\begin{column}{.5\textwidth}
+\begin{frame}[plain]{}
+\titlepage
 <<loadProfitData, echo=false>>=
 profitData <- read.table("ex1data2.txt", 
                             header=TRUE, sep=",")
@@ -73,6 +46,61 @@ model<-lm(price~house_size,data=profitData)
 abline(model)
 #plot(1:10)
 @
+<<displayProfitData0, fig=true, echo=false, include=false,width=6,height=4>>=
+plot(price~house_size,data=profitData, xlab="",ylab="",xaxt="n",yaxt="n")
+        
+model<-lm(price~house_size,data=profitData)
+abline(model)
+
+@
+\vspace*{-1cm}
+\begin{figure}[tbp]
+\includegraphics[height=45mm, width=60mm]{regressionPresentation-displayProfitData0}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
+\tableofcontents
+\end{frame}
+\section{Problembeschreibung}
+\begin{frame}[fragile]{Problembeschreibung}
+\begin{small}
+\[
+x = \begin{bmatrix} 1\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n},
+\:\: y \in \mathbb{R} \land y \in G (Gruppen)
+\]
+
+\begin{block}{Regression}
+\[
+y = h(x) + \epsilon
+\]
+\end{block}
+Praktische Fragestellung, X und Y aus dem Trainingsdatensatz, x und y aus dem Testdatensatz:
+\[
+\underset{y}{\operatorname{argmax}}\, p(y|x,X,Y) 
+\]
+
+
+\end{small}
+\end{frame}
+\section{Regressionsverfahren}
+\subsection{Lineare Regression}
+\begin{frame}{Lineare Regression}
+\begin{small}
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+\[
+\theta = \begin{bmatrix} \theta_0\\\theta_1\\\theta_2\\\vdots\\\theta_n \end{bmatrix} \in \mathbb{R}^{n+1}
+\]
+\vspace*{5mm}
+\[
+h_\theta(x)=\theta^Tx
+\]
+\[
+h_\theta(x)=\theta_0+\theta_1x_1+\theta_2x_2+\dots+\theta_nx_n
+\]
+\end{column}
+\begin{column}{.5\textwidth}
 \begin{figure}[tbp]
 \centering
 \includegraphics[height=45mm, width=60mm]{regressionPresentation-displayProfitData2}
@@ -82,13 +110,48 @@ abline(model)
 \end{small}
 \end{frame}
 
-\subsection{Polynomielle Regression}
-\begin{frame}{Polynomielle Regression}
-\begin{small}
-\[
-h_\theta=\theta_0 + \theta_1x + \theta_2x^2 + \theta_3\sqrt{x}
-\]
+\subsection{Nichtlineare Regression}
+<<plotNonLinearData, echo=false, fig=true, include=false>>=
+#nonLinearData <- generateDataset(100, xmin=0, xmax=4)
+    
+#plot(Y~X,data=nonLinearData, xlab="x",
+#        ylab="y");
+n<-100
+x<-seq(n)
+y<-rnorm(n,50+ 30*x^(-0.2),1)
+Data<-data.frame(x,y)
+plot(y~x,Data)
+model<-nls(y~a + c*x^(-d),data=Data, start = list(a=80, c=20, d=0.2))
+#loess_fit <- loess(y~x,Data)
+#model<-nls(Y~a + c*X^(-d),data=nonLinearData, start = list(a=80, c=20, d=0.2))
+lines(Data$x, predict(model))
+#abline(model)
+@
 
+\begin{frame}{Nichtlineare Regression}
+\begin{small}
+\begin{block}{Nichtlineare Regression}
+Linearkombination der Basisfunktionen $\phi$
+\begin{align*}
+h_\theta(x)&=\theta_0 + \theta_1\phi_1(x) + \theta_2\phi_2(x) + \theta_3\phi_3(x)\\
+\end{align*}
+\end{block}
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+Beispiel:
+\begin{align*}
+\phi_1(x) &= x_1,\\
+\phi_2(x) &= 0.1x_2\\ 
+\phi_3(x) &= 30x_3^{-0.2}
+\end{align*}
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{figure}[tbp]
+\centering
+\includegraphics[height=40mm, width=40mm]{regressionPresentation-plotNonLinearData}
+\end{figure}
+\end{column}
+\end{columns}
 \end{small}
 \end{frame}
 
@@ -99,24 +162,31 @@ admissionData <- read.table("admissionData.txt",header=TRUE,sep=",")
 admissionData$admitted <- as.factor(admissionData$admitted)
 @
 <<sigmoidFunction, fig=true, echo=false, include=false,width=4,height=4>>=
-par(cex.lab=1.2)
-plot(g, xlim=c(-5,5))
+par(cex.lab=1.5)
+plot(g, xlim=c(-5,5), xlab="u", ylab="g(u)")
 @
 \begin{columns}[T]
 \begin{column}{.5\textwidth}
+\vspace*{1cm}
 \[
-y\in\left\{{0,1,2,\dots,n}\right\}
+y\in\left\{{0,1}\right\}
 \]
 \[
 h_\theta(x) = g(\theta^Tx)
 \]
 \[
 g(z) = \frac{1}{1+e^{-z}}\]
+Falls $h_\theta(x) \ge 0.5$ \\
+\hspace{1cm}prognostiziere "y=1"\\
+sonst\\
+\hspace{1cm}prognostiziere "y=0"
 \end{column}
 \begin{column}{.5\textwidth}
+\vspace*{-1cm}
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.6\textwidth]{regressionPresentation-sigmoidFunction}
+\includegraphics[width=0.7\textwidth]{regressionPresentation-sigmoidFunction}
+\end{figure}
 <<admissionModel, echo=false>>=
 mdl <- glm(admitted~exam1+exam2,data=admissionData,
             family="binomial")
@@ -135,63 +205,191 @@ xyplot(exam1 ~ exam2, data=admissionData, groups=admitted,
 <<glmSummary,echo=false>>=
 #summary(mdl)
 @
+\vspace*{-1cm}
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=0.6\textwidth]{regressionPresentation-admissionDataGLM}
+\includegraphics[width=0.7\textwidth]{regressionPresentation-admissionDataGLM}
 \end{figure}
 
-\end{figure}
 \end{column}
 \end{columns}
 \end{frame}
 
 \section{Parameterschätzung}
-\begin{frame}{Parameterschätzung}
+\begin{frame}
 \begin{small}
 \[
-X = \begin{bmatrix} -x^{1^{T}}-\\-x^{2^{T}}-\\\vdots\\-x^{m^{T}}- \end{bmatrix} \in \mathbb{R}^{mxn}
+X = \begin{bmatrix} -x^{(1)^{T}}-\\-x^{(2)^{T}}-\\\vdots\\-x^{(m)^{T}}- \end{bmatrix} \in \mathbb{R}^{mxn}
+\:Y = \begin{bmatrix} y^{(1)}\\y^{(2)}\\\vdots\\y^{(m)} \end{bmatrix} \in \mathbb{R}^{m}
 \]
 \begin{block}{Kostenfunktion}
 \[
-\underset{\theta}{\operatorname{argmin}} J(\theta, X)
+\hat{\theta} = \underset{\theta}{\operatorname{argmin}}\, J(\theta)
 \]
 \end{block}
 \end{small}
 \end{frame}
 
-\subsection{Kleinste Quadrate}
-\begin{frame}{Kleinste Quadrate}
+\subsection{Maximum Likelihood}
+\begin{frame}{Maximum Likelihood Methode}
 \begin{small}
-nimmt als Prior Normalverteilung des Fehlers an
-\begin{block}{Kleinste Quadrate: Polynomielle Regression}
+\begin{block}{Maximum-Likelihood-Methode}
+Es bezeichne $\mathcal{D} = (d^{(1)}, d^{(2)} \dots d^{(m)})$ Realisierungen von Zufallsvariablen mit zugehöriger Wahrscheinlichkeitsdichte $p(\mathcal{D}|\delta)$.  
 \[
-J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{i})- y^{i})^2
+L(\delta) := p(\mathcal{D}|\delta)
 \]
+Wähle zu den Beobachtungen $\mathcal{D}$ als Parameterschätzung denjenigen Parameter $\hat{\delta}$, für
+den die Likelihood maximal ist, d.h.
+\[
+\hat{\delta} = \underset{\delta}{\operatorname{argmax}}\, L(\delta)
+\]
+\end{block}
+Beispiel: 
+\[
+p(d|\mu,\sigma) = \mathcal{N}(\mu, \sigma) = 
+    \frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{(d-\mu)^2}{2\sigma^2})
+\]
+\end{small}
+\end{frame}
+
+\begin{frame}{Kleinste Quadrate Herleitung}
+\begin{small}
+Annahme für das Regressionsproblem: 
+\[
+p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)
+\]
+\\
+\begin{align*}
+p(Y|X, \theta) &= \prod_{i=1}^{m}\mathcal{N}(h_\theta(x^{(i)}), \sigma_1) \\
+\ln p(Y|X,\theta) &= -\frac{\sigma_1}{2}\sum_{n=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \frac{m}{2}\ln\sigma_1 - \frac{m}{2}\ln(2\pi) 
+\end{align*}
+\end{small}
+\end{frame}
+
+\begin{frame}{Kleinste Quadrate (Least Squares)}
+\begin{small}
+\begin{block}{Kleinste Quadrate Kostenfunktion}
+\[
+J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
+\]
+\end{block}
+
+\begin{block}{Normalengleichung}
+\begin{align*}
+\frac{\partial}{\partial\theta_j}J(\theta) &= \frac{1}{m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})
+\,x^{(i)} \stackrel{!}{=} 0 \\
+\Rightarrow \theta&=(X^TX)^{-1}X^Ty
+\end{align*}
 \end{block}
 \end{small}
 \end{frame}
 
-\begin{frame}{Normalengleichung}
-\begin{small}
-\[
-\theta=(X^TX)^{-1}X^Ty
-\]
-%möglich, aber wesentlich langsamer für große daten 
-%lineare regression hat eh nur ein minimum
-\end{small}
-\end{frame}
-
+<<plotCostFunction, fig=true, echo=false, include=false>>=
+endValue <-function(start, step) {
+    return(start+ 99*step)
+}
+theta1Start <- -60000
+theta1Step <- 4000
+theta1s <- seq(theta1Start, endValue(theta1Start, theta1Step), theta1Step)
+theta2s <- seq(0, 198, 2)
+costs <- matrix(rep(NA, 100*100), 100)
+X <- data.matrix(data.frame(rep(1, length(profitData$house_size)),profitData$house_size))
+Y <- profitData$price
+for(i in 1:100) {
+    for(j in 1:100) {
+        costs[i, j] <- J(X, data.matrix(Y), c(theta1s[i], theta2s[j]))
+    }
+}
+#costFunctionFrame = data.frame(theta1s = theta1s, theta2s = theta2s, costs = costs)
+library(lattice)
+#wireframe(costs ~ theta1s * theta2s, costFunctionFrame)
+#xyplot(costs ~ theta1s * theta2s, data=costFunctionFrame)
+myLevels <-c(0,5000, 1000000,5000000, 10000000000)
+costs <- matrix(log(c(costs), base=100), 100)
+#contour(theta1s, theta2s, costs, nlevels=10)
+par(cex.lab=1.5)
+theta1 <- theta1s
+theta2 <-theta2s
+image(theta1, theta2, costs, col=terrain.colors(100), axes=FALSE)
+contour(theta1, theta2, costs, add=TRUE, col="brown")
+#filled.contour(theta1s, theta2s, costs, nlevels=20, col=grey(seq(0,1,0.05)), xlab="theta1", ylab="theta2")
+@
 \subsection{Gradientenverfahren}
 \begin{frame}{Gradientenverfahren}
 \begin{small}
-picture: gradient descent
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+\begin{block}{Gradientenverfahren}
+$\alpha$: Lernrate \\
+repeat until convergence \{\\
+\hspace{5mm}    $\theta_j := \theta_j - \alpha\frac{\partial}{\partial\theta_j}J(\theta)$\\
+\}\\
+\end{block}
+\end{column}
+\begin{column}{.5\textwidth}
+\vspace*{-1cm}
+\begin{figure}[tbp]
+\centering
+\includegraphics[height=40mm, width=40mm ]{regressionPresentation-plotCostFunction}
+\end{figure}
+\end{column}
+\end{columns}
+\end{small}
+\end{frame}
+
+\subsection{Regularisierung}
+<<plotOverfitting, fig=true, echo=false, include=false,width=4,height=4>>=
+plot(profitData$price~profitData$house_size,Data,xlab="",ylab="",xaxt="n",yaxt="n")
+profitData <- profitData[with(profitData, order(house_size)), ]
+model<-lm(price~house_size 
+            + I(house_size^2)+ I(house_size^3) + I(house_size^4) + I(house_size^5) 
+            + I(house_size^6) + I(house_size^7) + I(house_size^8) + I(house_size^9)
+            ,data=profitData)
+#loess_fit <- loess(y~x,Data)
+#model<-nls(Y~a + c*X^(-d),data=nonLinearData, start = list(a=80, c=20, d=0.2))
+lines(
+    profitData$house_size, 
+    predict(model), lwd=1)
+#curve(sum(summary(model)$coefficients * c(1, x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9)), add=T) #5.097075e+07+-2.381713e+05*x+4.739686e+02*x^2,add=T)
+
+@
+
+\begin{frame}{Regularisierung}
+\begin{small}
+\vspace{-1.5mm}
+\begin{center}
+Overfitting:
+\end{center}
+\vspace{-1.5cm}
+\begin{figure}[tbp]
+\includegraphics[height=40mm, width=40mm ]{regressionPresentation-plotOverfitting}
+\end{figure}
+\vspace{-1cm}
+\begin{block}{Regularisierte Kleinste Quadrate}
+\[
+J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})-y^{(i)})^2 + \lambda\sum_{i=1}^{n}\theta_j^2
+\]
+\end{block}
 \end{small}
 \end{frame}
 
 \subsection{Logistische Regression}
 \begin{frame}[fragile]{Logistische Regression}
 \begin{small}
-\begin{block}{Logistische Regression}
+<<logFunction1, fig=true, echo=false, include=false,width=4,height=4>>=
+par(cex.lab=1.5)
+par(mfrow=c(1,1))
+plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
+#plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
+@
+<<logFunction2, fig=true, echo=false, include=false,width=4,height=4>>=
+par(cex.lab=1.5)
+par(mfrow=c(1,1))
+
+plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
+@
+\vspace*{-5mm}
+
 \[
 J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)})
 \]
@@ -201,105 +399,90 @@ Cost(h_\theta(x),y) = \begin{cases}
                         -\log(1-h_\theta(x))    & if\:y = 0 \\
                     \end{cases}
 \end{equation*}
+
+\vspace*{-10mm}
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+\begin{figure}[tbp]
+\includegraphics[height=40mm, width=40mm ]{regressionPresentation-logFunction1}
+\end{figure}
+\end{column}
+\begin{column}{.5\textwidth}
+\begin{figure}[tbp]
+\includegraphics[height=40mm, width=40mm ]{regressionPresentation-logFunction2}
+\end{figure}
+\end{column}
+\end{columns}
+\vspace{-3mm}
+
+\begin{block}{Logistische Regression Kostenfunktion}
+\[
+J(\theta) = \frac{1}{m}\sum_{i=1}^{m}y^{(i)}\log h_\theta(x^{(i)})+ (1-y^{(i)})\log(1-h_\theta(x^{(i)}))
+\]
 \end{block}
 \end{small}
 \end{frame}
 
-
-
-
-%\section{Logistische Regression: Decision Boundary}
-%\begin{frame}[fragile]{Logistische Regression: Decision Boundary}
-%\begin{small}
-%<<admissionModel>>=
-%mdl <- glm(admitted~exam1+exam2,data=admissionData,
-%            family="binomial")
-%@
-%<<admissionDataGLM, fig=true, echo=false, include=false,width=3,height=3>>=
-%slope <- coef(mdl)[2]/(-coef(mdl)[3])
-%intercept <- coef(mdl)[1]/(-coef(mdl)[3])
-%library(lattice)
-%xyplot(exam1 ~ exam2, data=admissionData, groups=admitted, 
-%            panel=function(...) {
-%                panel.xyplot(...)
-%                panel.abline(intercept,slope)
-%                panel.grid(...)
-%                })
-%@
-%<<glmSummary,echo=false>>=
-%summary(mdl)
-%@
-%\begin{figure}[tbp]
-%\centering
-%\includegraphics[width=0.5\textwidth]{regressionPresentation-admissionDataGLM}
-%\end{figure}
-%
-%\end{small}
-%\end{frame}
-
-
-
-%\section{Maximum Likelihood Schätzer}
-%\begin{frame}[fragile]{Maximum Likelihood Schätzer}
-%\begin{small}
-%MLE is identical to OLS under the normality assumption for the error terms.
-%\[
-%P(Y_i) \sim \mathcal{N}(h_\theta(x),\sigma^2)
-%\]
-%f: Wahrscheinlichkeitsfunktion
-%\[
-%L(\theta) = f(x|\theta)
-%\]
-%\[
-%L(\hat{\theta}) = \underset{\theta}{\operatorname{argmax}} L(\theta)
-%\]
-%then it is an optimizing problem
-%\end{small}
-%\end{frame}
-
 \section{Bayes'sche Lineare Regression}
+\subsection{Bayes Inferenz}
+\begin{frame}[fragile]{Bayes Inferenz}
+\begin{small}
+\begin{block}{Bayes-Inferenz}
+Die Wahrscheinlichkeitsdichte von $\mathcal{D}$, gegeben $\delta$, sei $p(d|\delta)$
+und $L(\delta) = p(\mathcal{D}|\delta)$ die Likelihoodfunktion. Für den unbekannten 
+Parameter wird eine a priori Dichte 
+\[
+p(\delta)
+\]
+spezifiziert.
+Dann ist die a posteriori Dichte über den Satz von Bayes bestimmt durch
+\[
+p(\delta|\mathcal{D}) = \frac{p(d|\delta)p(\delta)}{p(\mathcal{D})} = 
+\frac{L(\delta)p(\delta)}{\int L(\delta)p(\delta)d\delta}
+\]
+\end{block}
+\end{small}
+\end{frame}
+
+\subsection{Bayes-Schätzer}
+\begin{frame}[fragile]{Bayes-Schätzer}
+\begin{small}
+\begin{block}{Maximum a posteriori (MAP) Schätzer}
+Wähle denjenigen Parameterwert $\hat{\delta}_{MAP}$, für den die a posteriori Dichte maximal wird,
+d.h.
+\[
+\hat{\delta}_{MAP} = \underset{\delta}{\operatorname{argmax}}\, L(\delta)p(\delta)
+\]
+\end{block}
+\end{small}
+\end{frame}
+
+\subsection{Bayes'sche Lineare Regression}
 \begin{frame}[fragile]{Bayes'sche Lineare Regression}
 \begin{small}
-coincides with maximum likelihood given a uniform prior distribution
-data is supplemented with additional information in the form of a prior probability distribution.
+Parametervektor $\theta$ \\
+\hspace{1cm}a priori Wahrscheinlichkeitsdichte: $p(\theta) = \mathcal{N}(0, \sigma_0)$ \\
+\hspace{1cm}a posteriori Dichte: \hspace{1.3cm}$p(\theta|X,Y) \propto p(Y|X,\theta)p(\theta)$ \\
+\vspace{0.5cm}
+\begin{block}{Kostenfunktion}
 \[
-gegeben:\:f(x|\theta), L(\theta), f(\theta)
+J(\theta) = \frac{\sigma_1}{2}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \frac{\sigma_0}{2}\theta^T\theta
 \]
+\end{block}
+\vspace{0.5cm}
+\begin{block}{Vorhersage eines Zielmerkmals}
 \[
-P(\theta) \sim \mathcal{N}(\mu_0,S_0)
+p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
 \]
-\[
-P(\theta|y) \sim \mathcal{N}(\mu,S)
-\]
+\end{block}
+%coincides with maximum likelihood given a uniform prior distribution
 
 \end{small}
 \end{frame}
 
 \section{Anwendung}
 \begin{frame}{Anwendung}
-Phylogenetic Trees: wikipedia
-\end{frame}
-\begin{frame}
-A displayed formula:
-\[
-  \int_{-\infty}^\infty e^{-x^2} \, dx = \sqrt{\pi}
-\]
-
-An itemized list:
-
-\begin{itemize}
-  \item itemized item 1
-  \item itemized item 2
-  \item itemized item 3
-\end{itemize}
-\begin{block}{Regression}
-test
-\end{block}
-\begin{theorem}
-  In a right triangle, the square of hypotenuse equals
-  the sum of squares of two other sides.
-\end{theorem}
-
+problemkomplexität
 \end{frame}
 
 \end{document}
