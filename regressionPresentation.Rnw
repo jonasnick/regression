@@ -44,8 +44,8 @@ profitData <- read.table("ex1data2.txt",
 #lines(density(profitData$price))
 #head(profitData$price)
 #hist(profitData$price, breaks=10,prob=T)
-plot(price~house_size,data=profitData, xlab="Size of the house",
-        yaxt="n",ylab="Price");
+plot(price~house_size,data=profitData, xlab="Hausgröße",
+        yaxt="n",ylab="Preis");
 ymin=min(profitData[,3])
 ymax=max(profitData[,3])
 axis(2, at=c(ymin, (ymin+ymax)/2, ymax))
@@ -171,7 +171,13 @@ admissionData$admitted <- as.factor(admissionData$admitted)
 @
 <<sigmoidFunction, fig=true, echo=false, include=false,width=4,height=4>>=
 par(cex.lab=1.5)
-plot(g, xlim=c(-5,5), xlab="u", ylab="g(u)")
+par(cex.axis=1.5)
+plot(g, xlim=c(-5,5), ylim=c(-0.1, 1.2), xlab="u", ylab="g(u)", yaxt="n",xaxt="n")
+axeX=seq(0, 1.2, 0.5)
+axis(2, at=axeX, labels=axeX)
+axeY=c(0)
+axis(1, at=axeY, labels=axeY)
+abline(v=0)
 @
 \begin{columns}[T]
 \begin{column}{.5\textwidth}
@@ -184,6 +190,7 @@ h_\theta(x) = g(\theta^Tx)
 \]
 \[
 g(z) = \frac{1}{1+e^{-z}}\]
+\vspace{0.3mm}
 Falls $h_\theta(x) \ge 0.5$ \\
 \hspace{1cm}prognostiziere "y=1"\\
 sonst\\
@@ -294,17 +301,17 @@ J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
 
 <<plotCostFunction, fig=true, echo=false, include=false>>=
 endValue <-function(start, step) {
-    return(start+ 99*step)
+    return(start+ 199*step)
 }
 theta1Start <- -60000
 theta1Step <- 4000
-theta1s <- seq(theta1Start, endValue(theta1Start, theta1Step), theta1Step)
-theta2s <- seq(0, 198, 2)
-costs <- matrix(rep(NA, 100*100), 100)
+theta1s <- seq(theta1Start, endValue(theta1Start, theta1Step/2), theta1Step/2)
+theta2s <- seq(0, 199, 1)
+costs <- matrix(rep(NA, 200*200), 200)
 X <- data.matrix(data.frame(rep(1, length(profitData$house_size)),profitData$house_size))
 Y <- profitData$price
-for(i in 1:100) {
-    for(j in 1:100) {
+for(i in 1:200) {
+    for(j in 1:200) {
         costs[i, j] <- J(X, data.matrix(Y), c(theta1s[i], theta2s[j]))
     }
 }
@@ -312,13 +319,14 @@ for(i in 1:100) {
 #wireframe(costs ~ theta1s * theta2s, costFunctionFrame)
 #xyplot(costs ~ theta1s * theta2s, data=costFunctionFrame)
 myLevels <-c(0,5000, 1000000,5000000, 10000000000)
-costs <- matrix(log(c(costs), base=100), 100)
+costs <- matrix(log(c(costs), base=200), 200)
 #contour(theta1s, theta2s, costs, nlevels=10)
 par(cex.lab=1.5)
 theta1 <- theta1s
 theta2 <-theta2s
-image(theta1, theta2, costs, col=terrain.colors(100), axes=FALSE)
-contour(theta1, theta2, costs, add=TRUE, col="brown")
+palette(gray(seq(0,1.0,len=10))) #gray scales; print old palette
+image(theta1, theta2, costs, col=palette(), axes=FALSE)
+contour(theta1, theta2, costs, add=TRUE, col="black")
 #filled.contour(theta1s, theta2s, costs, nlevels=20, col=grey(seq(0,1,0.05)), xlab="theta1", ylab="theta2")
 @
 \subsection{Gradientenverfahren}
@@ -493,6 +501,7 @@ p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
 <<loadTitanicData, echo=false>>=
 titanicTrainData <- read.csv("titanicTrain.csv")
 titanicTestData <- read.csv("titanicTest.csv")
+titanicTrainData <- titanicTrainData[,!names(titanicTrainData) %in% c("name")]
 titanicTrainData$pclass <- as.factor(titanicTrainData$pclass)
 titanicTrainData$embarked <- as.factor(titanicTrainData$embarked)
 titanicTrainData$sex <- as.factor(titanicTrainData$sex)
@@ -515,6 +524,8 @@ testModel <- function() {
 #titanicTestData <- read.csv("titanicTest.csv")
 head(titanicTrainData)
 @
+\vspace{-0.9mm}
+\hspace{0.2mm}$\vdots$
 \end{frame}
 
 \begin{frame}{Datensatz}
@@ -597,8 +608,12 @@ summary(model)
 \section{Zusammenfassung}
 \begin{frame}{Zusammenfassung}
 \begin{itemize}
-\item one
-\item two
+\item Ein Regressionsmodell verknüpft $y$ mit einer Funktion von $x$ und $\theta$
+\item Lineare Regression ist die Linearkombination von gewichteten erklärenden Merkmalen.
+\item Kleinste Quadrate Kostenfunktion ergibt sich aus der Maximum Likelihood Parameterschätzung.
+\item Logistische Regression klassifiziert mittels Verbindungsfunktion.
+\item Bayes Regression nimmt eine a priori Verteilung der Koeffizienten an womit sich ihre a posteriori Verteilung berechnet.  
+
 \end{itemize}
 \begin{small}
 \end{small}
