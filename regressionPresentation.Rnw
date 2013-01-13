@@ -1,26 +1,34 @@
 % regressionPresentationRnw
 % R code style:
-%\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=2em}
-%\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
-%\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
-%\fvset{listparameters={\setlength{\topsep}{0pt}}}
-%\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
 \documentclass{beamer}
 \usetheme{Darmstadt}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 
+\SweaveOpts{keep.source=TRUE}
 \title{Lineare Regression}
 \subtitle{Kleinste Quadrate, Maximum Likelihood und Bayes}
 \author{Jonas Nick}
 \beamertemplatenavigationsymbolsempty
 \setbeamertemplate{footline}[frame number]
+\setbeamertemplate{section in toc}{\inserttocsection}
 
 \begin{document}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{xleftmargin=2em}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{xleftmargin=2em}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\tiny,fontshape=n}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\tiny,fontshape=n}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\tiny,fontshape=n}
+
+
 %Shortens output lines
 <<echo=false>>=
-options(width=60)
+options(width=100)
 options(continue=" ")
+options(prompt=" ")
 source("regressionFunctions.R")
 @
 \begin{frame}[plain]{}
@@ -60,7 +68,7 @@ abline(model)
 \end{frame}
 
 \begin{frame}[fragile]{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
-\tableofcontents
+\small\tableofcontents
 \end{frame}
 \section{Problembeschreibung}
 \begin{frame}[fragile]{Problembeschreibung}
@@ -301,7 +309,6 @@ for(i in 1:100) {
     }
 }
 #costFunctionFrame = data.frame(theta1s = theta1s, theta2s = theta2s, costs = costs)
-library(lattice)
 #wireframe(costs ~ theta1s * theta2s, costFunctionFrame)
 #xyplot(costs ~ theta1s * theta2s, data=costFunctionFrame)
 myLevels <-c(0,5000, 1000000,5000000, 10000000000)
@@ -481,8 +488,121 @@ p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
 \end{frame}
 
 \section{Anwendung}
-\begin{frame}{Anwendung}
-problemkomplexität
+\subsection{Titanic}
+\begin{frame}[fragile]{Datensatz}
+<<loadTitanicData, echo=false>>=
+titanicTrainData <- read.csv("titanicTrain.csv")
+titanicTestData <- read.csv("titanicTest.csv")
+titanicTrainData$pclass <- as.factor(titanicTrainData$pclass)
+titanicTrainData$embarked <- as.factor(titanicTrainData$embarked)
+titanicTrainData$sex <- as.factor(titanicTrainData$sex)
+titanicTestData$pclass <- as.factor(titanicTestData$pclass)
+titanicTestData$sex <- as.factor(titanicTestData$sex)
+titanicTestData$embarked <- as.factor(titanicTestData$embarked)
+titanicTrainTest <- titanicTrainData
+titanicTrainData$survived <- as.factor(titanicTrainData$survived)
+
+titanicTrainTest <- na.omit(titanicTrainTest)
+testModel <- function() {
+  titanicTrainPrediction = sapply((predict(model, type="response", newdata=titanicTrainTest)),threshold)
+  titanicTrainTest$survived <- as.numeric(titanicTrainTest$survived)
+  difference = titanicTrainTest$survived - titanicTrainPrediction
+  correctFraction = (1-sum(abs(difference))/length(difference))
+  return(paste(c("Trainingsdaten: ",as.character(correctFraction),"% korrekte Vorhersagen"),collapse = ""))
+}
+@
+<<printTitanicData,echo=false>>=
+#titanicTestData <- read.csv("titanicTest.csv")
+head(titanicTrainData)
+@
 \end{frame}
+
+\begin{frame}{Datensatz}
+<<plotTitanicAge, echo=false, include=false, fig=true>>=
+par(cex.lab=1.8)
+par(cex.axis=1.8)
+plot(survived~age,data=titanicTrainData)
+@
+<<plotTitanicSex, echo=false, include=false, fig=true>>=
+mosaic(survived~sex, data=titanicTrainData,shade = TRUE, 
+       labeling_args=list(gp_labels=gpar(fontsize=20),
+                          gp_varnames=gpar(fontsize=22)),
+       legend_args=list(fontsize=16),
+       margins=unit(4, "lines"),
+       legend_width=unit(7, "lines"))
+@
+<<plotTitanicClass, echo=false, include=false, fig=true>>=
+mosaic(survived~pclass, data=titanicTrainData, shade = TRUE, 
+       labeling_args=list(gp_labels=gpar(fontsize=20),
+                          gp_varnames=gpar(fontsize=22)),
+       legend_args=list(fontsize=16),
+       margins=unit(4, "lines"),
+       legend_width=unit(7, "lines"))
+
+@
+\begin{figure}[tb]
+\vspace{-0.8cm}
+\includegraphics[height=50mm, width=50mm]{regressionPresentation-plotTitanicClass}
+\hfill
+\includegraphics[height=50mm, width=50mm]{regressionPresentation-plotTitanicSex}
+\end{figure}
+\vspace{-1.6cm}
+\begin{figure}[b]
+\includegraphics[height=45mm, width=45mm]{regressionPresentation-plotTitanicAge}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Modell}
+\begin{small}
+<<fitFirstModel, echo=true>>=
+model <- glm(survived~age + sex + I(pclass==1) + I(pclass==2),data=titanicTrainData, 
+                family=binomial("logit"))
+@
+
+<<analyseFirstModel,echo=false>>=
+print(testModel())
+@
+\end{small}
+\end{frame}
+\begin{frame}[fragile]{Modell}
+\begin{small}
+<<analyseFirstModel,echo=false>>=
+summary(model)
+@
+\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{Modell}
+\begin{small}
+
+<<analyseLogAgeModel,echo=true>>=
+model <- glm(survived~I(log(age)) + sex + pclass +  sibsp,data=titanicTrainData, 
+                family=binomial("logit"))
+@
+<<analyseLogAgeModel,echo=false>>=
+print(testModel())
+print("Testdaten: 0.751% korrekte Vorhersagen")
+@
+\end{small}
+\end{frame}
+
+\begin{frame}[fragile]{Modell}
+\begin{small}
+<<analyseLogAgeModel,echo=false>>=
+summary(model)
+@
+\end{small}
+\end{frame}
+
+\section{Zusammenfassung}
+\begin{frame}{Zusammenfassung}
+\begin{itemize}
+\item one
+\item two
+\end{itemize}
+\begin{small}
+\end{small}
+\end{frame}
+
 
 \end{document}
