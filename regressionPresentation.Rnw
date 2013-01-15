@@ -66,9 +66,6 @@ abline(model)
 \begin{figure}[tbp]
 \includegraphics[height=45mm, width=60mm]{regressionPresentation-displayProfitData0}
 \end{figure}
-\begin{figure}[tb]
-\includegraphics[width=44px]{ccicon}
-\end{figure}
 
 \end{frame}
 
@@ -177,7 +174,7 @@ admissionData$admitted <- as.factor(admissionData$admitted)
 <<sigmoidFunction, fig=true, echo=false, include=false,width=4,height=4>>=
 par(cex.lab=1.5)
 par(cex.axis=1.5)
-plot(g, xlim=c(-5,5), ylim=c(-0.1, 1.2), xlab="u", ylab="g(u)", yaxt="n",xaxt="n")
+plot(g, xlim=c(-5,5), ylim=c(-0.1, 1.2), xlab="z", ylab="g(z)", yaxt="n",xaxt="n")
 axeX=seq(0, 1.2, 0.5)
 axis(2, at=axeX, labels=axeX)
 axeY=c(0)
@@ -276,7 +273,7 @@ p(d|\mu,\sigma) = \mathcal{N}(\mu, \sigma) =
 \begin{small}
 Annahme für das Regressionsproblem: 
 \[
-p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)
+L(\theta) = p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)
 \]
 \\
 \begin{align*}
@@ -297,7 +294,7 @@ J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})- y^{(i)})^2
 \begin{block}{Normalengleichung}
 \begin{align*}
 \frac{\partial}{\partial\theta_j}J(\theta) &= \frac{1}{m}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})
-\,x^{(i)} \stackrel{!}{=} 0 \\
+\,x_j^{(i)} \stackrel{!}{=} 0 \\
 \Rightarrow \theta&=(X^TX)^{-1}X^Ty
 \end{align*}
 \end{block}
@@ -378,7 +375,9 @@ lines(
 \begin{small}
 \vspace{-1.5mm}
 \begin{center}
-Overfitting:
+\footnotesize
+Overfitting
+\normalsize
 \end{center}
 \vspace{-1.5cm}
 \begin{figure}[tbp]
@@ -437,7 +436,7 @@ Cost(h_\theta(x),y) = \begin{cases}
 
 \begin{block}{Logistische Regression Kostenfunktion}
 \[
-J(\theta) = \frac{1}{m}\sum_{i=1}^{m}y^{(i)}\log h_\theta(x^{(i)})+ (1-y^{(i)})\log(1-h_\theta(x^{(i)}))
+J(\theta) = -\frac{1}{m}\sum_{i=1}^{m}y^{(i)}\log h_\theta(x^{(i)})+ (1-y^{(i)})\log(1-h_\theta(x^{(i)}))
 \]
 \end{block}
 \end{small}
@@ -482,7 +481,8 @@ d.h.
 \begin{small}
 Parametervektor $\theta$ \\
 \hspace{1cm}a priori Wahrscheinlichkeitsdichte: $p(\theta) = \mathcal{N}(0, \sigma_0)$ \\
-\hspace{1cm}a posteriori Dichte: \hspace{1.3cm}$p(\theta|X,Y) \propto p(Y|X,\theta)p(\theta)$ \\
+\hspace{1cm}Likelihood: \hspace{1cm}$L(\theta) = p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)$\\
+\hspace{1cm}a posteriori Dichte: \hspace{1.3cm}$p(\theta|x,y) \propto p(y|x,\theta)p(\theta)$ \\
 \vspace{0.5cm}
 \begin{block}{Kostenfunktion}
 \[
@@ -522,15 +522,16 @@ testModel <- function() {
   titanicTrainTest$survived <- as.numeric(titanicTrainTest$survived)
   difference = titanicTrainTest$survived - titanicTrainPrediction
   correctFraction = (1-sum(abs(difference))/length(difference))
-  return(paste(c("Trainingsdaten: ",as.character(correctFraction),"% korrekte Vorhersagen"),collapse = ""))
+  return(paste(c("Trainingsdaten: ",as.character(correctFraction*100),"% korrekte Vorhersagen"),collapse = ""))
 }
 @
+\tiny
 <<printTitanicData,echo=false>>=
-#titanicTestData <- read.csv("titanicTest.csv")
 head(titanicTrainData)
 @
+
 \vspace{-0.9mm}
-\hspace{0.2mm}$\vdots$
+\hspace{0.5cm}$\vdots$
 \end{frame}
 
 \begin{frame}{Datensatz}
@@ -599,13 +600,14 @@ summary(model)
 \begin{normalsize}
 {\small
 <<analyseLogAgeModel,echo=true>>=
-model <- glm(survived~I(log(age)) + sex + pclass +  sibsp,
+model <- glm(survived~I(log(age)) + sex 
+                + pclass +  sibsp,
                 data=titanicTrainData, 
                 family=binomial("logit"))
 @
 <<analyseLogAgeModel,echo=false>>=
 cat(testModel())
-cat("Testdaten: 0.751% korrekte Vorhersagen")
+cat("Testdaten: 75.1% korrekte Vorhersagen")
 @
 \hspace*{1.0cm}
 }
