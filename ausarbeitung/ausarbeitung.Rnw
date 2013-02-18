@@ -48,7 +48,7 @@ Die folgende Arbeit führt in Regressionsmodelle, wie lineare, nichtlineare und 
 \end{abstract}
 
 \section{Problembeschreibung}
-Charakteristisch für überwachtes Maschinelles Lernen, wie Regression, ist das Beschreiben der Beziehung von Zielvariable und erklärender Variable\sidenote{werden auch abhängige und unabhängige Variable oder Prädiktor genannt} aus vorliegenden Daten, also Realisierungen von Zufallsvariablen.  Folgende Notation wird für die Daten genutzt:
+Charakteristisch für überwachtes maschinelles Lernen, zu der auch die Regression gehört, ist das Beschreiben der Beziehung von Zielvariable und erklärender Variable\sidenote{werden auch abhängige und unabhängige Variable oder Prädiktor genannt} aus vorliegenden Daten, also Realisierungen von Zufallsvariablen.  Folgende Notation wird für die Daten genutzt:
 \[
 x = \begin{bmatrix} 1\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n},
 \:\: y \in \mathbb{R} \land y \in G (Gruppen)
@@ -64,7 +64,8 @@ y = h(x) + \epsilon
 
 Das Ziel einer Regressionsanalyse besteht grundsätzlich darin, den Fehler $\epsilon$ (auch Residuum genannt) möglichst klein zu halten. 
 Denn meist ist man daran interessiert, aus gänzlich neuen erklärenden Variablen die Zielvariable vorrauszusagen.
-Es soll also das $y$ vorrausgesagt werden, dass die höchste Wahrscheinlichkeit besitzt, gegeben des neuen Datenpunkts $x$ und vorherigen Erfahrungen $X$ und $Y$.
+Es soll also das $y$ vorrausgesagt werden, dass die höchste Wahrscheinlichkeit besitzt, wenn der neue  Datenpunkt $x$ und die vorherigen Erfahrungen $X$ und $Y$ vorliegen.
+
 \[
 \underset{y}{\operatorname{argmax}}\, p(y|x,X,Y) 
 \]
@@ -136,9 +137,9 @@ lines(Data$x, predict(model))
 
 
 \subsection{Logistische Regression}
-Falls es sich um ein Klassifikationsproblem handels, das Zielmerkmal also nicht metrisch ist sondern nur abgrenzbare Kategorien annehmen kann, wendet man Logistische Regression an. Im folgenden werden wir uns auf zwei Kategorien beschränken.
+Falls es sich um ein Klassifikationsproblem handelt, das Zielmerkmal also nicht metrisch ist sondern nur abgrenzbare Kategorien annehmen kann, wendet man logistische Regression an. Im folgenden werden wir uns auf zwei Kategorien beschränken.
 Man nehme an, dass $y\in\{0,1\}$ und die Kategorien jeweils 0 und 1 entsprechen. 
-Dann folgt die abhängige Variable einer Bernoulli Verteilung gegeben der unabhängigen Variablen, parametrisiert mit der Wahrscheinlichkeit für Kategorie 1 ('Erfolg').
+Wenn die erklärenden Variablen $x$ vorliegen folgt die abhangige Variable $y$ dann einer Bernoulli Verteilung, die mit der Wahrscheinlichkeit für Kategorie 1 ('Erfolg') $p$ parameterisiert ist.
 \begin{align*}
 y&\in\left\{{0,1}\right\}\\
 y|x &\sim Bernoulli(p)
@@ -173,7 +174,7 @@ Die angesprochene Verbindungsfunktion, ist hier die namensgebende logistische Fu
 \[
 g(z) = \frac{1}{1+e^{-z}}
 \]
-Die Hypothese hat nun genau die Eigenschaft dass ihre logarithmierten Odds\sidenote{Odds ist eine Möglichkeit Wahrscheinlichkeiten $p$ anzugeben und folgendermaßen definiert: $\frac{p}{1-p}$} (logit) $\pi(x)$ äquivalent zur lineare Regressionshypothese ist.
+Die Hypothese hat nun genau die Eigenschaft dass ihre logarithmierten Odds\sidenote{Odds ist eine Möglichkeit Wahrscheinlichkeiten $p$ anzugeben und folgendermaßen definiert: $\frac{p}{1-p}$} (logit) $\pi(x)$ äquivalent zur linearen Regressionshypothese ist.
 \[
 \pi(x) = \ln\frac{h_\theta(x)}{1-h_\theta(x)}=\theta^Tx
 \]
@@ -186,7 +187,7 @@ t(x) = \begin{cases}
             \end{cases}
 \end{equation*}
 
-Zur Klassifikation mehrer Variablen wird die sogenannte einer-gegen-alle Klassifikation angewandt, indem für jede Klasse $i$ für die Wahrscheinlichkeit, dass $y=i$ eine Hypothese $h_\theta^{(i)}(x)$ aufgestellt wird \citep[Lecture 6]{MLcoursera} 
+Zur Klassifikation mehrer Variablen wird die sogenannte einer-gegen-alle Klassifikation angewandt, indem für jede Klasse $i$ für die Wahrscheinlichkeit, dass $y=i$ eine Hypothese $h_\theta^{(i)}(x)$ aufgestellt wird \citep[Ch. 2.2]{bishop} 
 
 <<loadAdmissionData,echo=FALSE>>=
 admissionData <- read.table("../data/admissionData.txt",header=TRUE,sep=",")
@@ -214,14 +215,13 @@ xyplot(exam1 ~ exam2, data=admissionData,xlab="Klausur 1", ylab="Klausur 2", gro
     \label{fig:DecisionBoundary}
 \end{marginfigure}
 
-Aus den Koeffizienzen lässt sich dann eine Entscheidungsgrenze berechnen. Da $\theta^Tx>0 \Leftrightarrow y=1$ folgt als Entscheidungsgrenze für ein Beispiel mit zwei erklärenden Variablen $x_1$ und $x_2$ (Abbildung \ref{fig:DecisionBoundary}):
+Aus den Koeffizienzen lässt sich dann eine Entscheidungsgrenze berechnen. Da $\theta^Tx>0 \Leftrightarrow y=1$ lässt sich als Entscheidungsgrenze eine n-1 dimensionale Hyperebene berechnen. Sie teilt den Raum der erklärenden Variablen in zwei Halbräume, die jeweils eine Kategorie von $y$ repräsentieren. \footnote{Beispiel mit zwei erklärenden Variablen $x_1$ und $x_2$ (Abbildung \ref{fig:DecisionBoundary}):
 \begin{align*}
 \theta^Tx&=0 \\
 \theta_0 + \theta_1x_1 + \theta_2x_2 &= 0 \\
 f(x_1) = x_2 &= -\frac{\theta_0}{\theta_2} -\frac{\theta_1}{\theta_2}x_1
-\end{align*} 
-Für nichtlineare Regression ließe sich die Entscheidungsgrenze analog berechnen.
-
+\end{align*}} 
+Die Entscheidungsgrenze für nichtlineare Regression ist analog zu berechnen.
 
 
 \section{Parameterschätzung}
@@ -303,7 +303,7 @@ der Parametervektor direkt berechnen lässt \citep[Ch. 3.1.1]{bishop}.
 \Rightarrow \theta  &=X^{+}y \\
                     &=(X^TX)^{-1}X^Ty
 \end{align*}
-$X^{+}$ bezeichnet hier die \emph{Moore-Penrose Pseudoinverse} von $X$, die das Konzept von Invertierbarkeit auf nichtquadratische Matrizen erweitert und allgemein zum Berechnen von optimalen Lösungen mit kleinster euklidischer Norm bei linearen Ausgleichsprobleme verwendet wird.
+$X^{+}$ bezeichnet hier die \emph{Moore-Penrose Pseudoinverse} von $X$, die das Konzept von Invertierbarkeit auf nichtquadratische Matrizen erweitert und allgemein zum Berechnen von optimalen Lösungen mit kleinster euklidischer Norm bei linearen Ausgleichsproblemen verwendet wird.
 Es kann allerdings vorkommen, dass $X^TX$ nicht invertierbar ist - häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
 
 \subsection{Gradientenverfahren}
@@ -353,9 +353,8 @@ repeat until convergence \{\\
 Die Parameter $\theta_j$ sind anfangs zufällig initialisiert.
 Wichtig ist die Wahl der Lernrate $\alpha$, die bestimmt wie weit in der Funktion gesprungen wird. 
 Falls nämlich $\alpha$ zu groß gewählt wurde, so kann es sein, dass der Algorithmus systematisch das Minimum überspringt und der Algorithmus daher nicht konvergiert.
-Falls das Gradientenverfahren ein Minimum findet, so ist es global, da die Kostenfunktion für lineare 
-%und nichtlineare (in wie fern stimmt das?)
-Regression konvex ist.
+Falls das Gradientenverfahren ein Minimum findet, so ist es global, da die maximum likelihood Kostenfunktion für lineare 
+Regression konvex ist. \citep[Ch. 1.6.1]{bishop}
 
 Es gibt elaboriertere Optimierungsverfahren, wie konjugierte Gradienten oder das BFGS Verfahren, die keine explizite Lernrate benötigen und unter Umständen schneller konvergieren.
 
@@ -417,7 +416,7 @@ diese dann auf die lineare Regression anzuwenden.
 \subsection{Bayes Schätzer}
 Bei der Maximum Likelihood Methode wird der Parameter so gewählt, dass die vorliegende Beobachtung der Daten am wahrscheinlichsten ist.
 Tatsächlich wäre es aber umgekehrt wesentlich intuitiver, den Parameter zu wählen, der unter den vorliegenden Daten am wahrscheinlichsten ist (a posteriori Wahrscheinlichkeit). Dieses Vorgehen ist mit Bayes Inferenz möglich.
-Wie gehabt sei $p(d|\delta)$ die Wahrscheinlichkeitsdichte der Daten $\mathcal{D}$, gegeben Parameter $\delta$, und $L(\delta) = p(\mathcal{D}|\delta)$ die Likelihoodfunktion. 
+Wie gehabt sei $p(D|\delta)$ die Wahrscheinlichkeitsdichte der Daten $\mathcal{D}$, gegeben Parameter $\delta$, und $L(\delta) = p(\mathcal{D}|\delta)$ die Likelihoodfunktion. 
 
 \newthought{Die Erweiterung ist,} dass für das unbekannte $\delta$ eine a priori Dichte 
 \[
@@ -456,9 +455,10 @@ J(\theta) = \frac{\sigma_1}{2}\sum_{i=1}^{m}(h_\theta(x^{(i)}) - y^{(i)})^2 + \f
 \]
 Diese Kostenfunktion ähnelt sehr der Kleinsten Quadrate Kostenfunktion, außer dass durch den zweiten Summanden ganz allgemein größere Parameter $\theta$ höhere Kosten verursachen. Dieser wird Regularisierungsterm genannt und er hilft zu vermeiden, dass  
 das Modell überangepasst ist (Overfitting, Abbildung \ref{fig:plotOverfitting}),
-
+also die Trainingsdaten zwar sehr gut approximiert, aber für neue Daten schlechte Voraussagen gemacht werden, da der Einfluss einzelner erklärender Merkmale zu groß ist.  
 <<plotOverfitting, fig=true, echo=false, include=false>>=
-par(cex=1.2)
+par(cex.lab=1.8)
+par(cex.axis=1.8)
 plot(profitData$price~profitData$house_size,Data,xlab="Hausgröße",ylab="Preis",xaxt="n",yaxt="n")
 profitData <- profitData[with(profitData, order(house_size)), ]
 model<-lm(price~house_size 
@@ -472,21 +472,17 @@ lines(
     profitData$house_size, 
     predict(model), lwd=1)
 #curve(sum(summary(model)$coefficients * c(1, x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9)), add=T) #5.097075e+07+-2.381713e+05*x+4.739686e+02*x^2,add=T)
-
 @
-
 \begin{marginfigure}
     \includegraphics[scale=0.4]{ausarbeitung-plotOverfitting}
     \caption{Polynomielle Regression 10. Grades des Hauspreises ohne Regularisierung}
     \label{fig:plotOverfitting}
 \end{marginfigure}
-
-also die Trainingsdaten zwar sehr gut approximiert, aber für neue Daten schlechte Voraussagen gemacht werden, da der Einfluss einzelner erklärender Merkmale zu groß ist.  
 Es gibt eine handvoll von Regularisierungsverfahren, aber eine gängige Erweiterung wird \emph{Tikhonov Regularisierung} genannt. Angewandt auf die kleinste Quadrate Kostenfunktion bedeutet folgendes:
 \[
 J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})-y^{(i)})^2 + \lambda\sum_{j=1}^{n}\theta_j^2
 \]
-Der Koeffizient $\lambda$ beschreibt die relative Wichtigkeit des Regularisierungsterms im Vergleich zu den Fehlerquadraten und wird beispielsweise mit Kreuzvalidierung gefunden. Für diese Kostenfunktionen lässt sich das Minimum analog mit Normalgleichung oder Gradientenabstieg berechnen \citep[Slide 7]{MLcoursera}. 
+Der Koeffizient $\lambda$ beschreibt die relative Wichtigkeit des Regularisierungsterms im Vergleich zu den Fehlerquadraten und wird beispielsweise mit Kreuzvalidierung gefunden. Für diese Kostenfunktionen lässt sich das Minimum analog mit Normalgleichung oder Gradientenabstieg berechnen \citep[Ch. 1.1]{bishop}. 
 
 \newthought{Vorraussage eines neuen} $y$, basierend auf neuen erklärenden Merkmalen $x$ und vorherigen Daten $X$ und $Y$ war ein anfänglich gestelltes Problem. 
 Mit Bayes'schen Mitteln lässt sich dazu die a posteriori Dichte des Zielmerkmals ermitteln. Diese wird durch Herausmarginalisieren von $\theta$ aus den bekannten Wahrscheinlichkeitsdichten berechnet:
