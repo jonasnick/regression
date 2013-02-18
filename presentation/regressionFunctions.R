@@ -80,6 +80,7 @@ testModel <- function() {
   return(correctFraction)
 }
 titanicTrainData <- titanicTrainData[,!names(titanicTrainData) %in% c("name")]
+par(cex=1.6)
 plot(survived~age,data=titanicTrainData)
 colnames(titanicTrainData)
 mosaic(survived~sex, data=titanicTrainData,shade = TRUE, 
@@ -90,6 +91,7 @@ mosaic(survived~sex, data=titanicTrainData,shade = TRUE,
        legend_width=unit(7, "lines"))
 mosaic(titanicTrainData$survived~titanicTrainData$sex)
 table(titanicTrainData$survived,titanicTrainData$sex)
+
 
 plot(titanicTrainData$survived~titanicTrainData$pclass)
 mosaic(titanicTrainData$survived~titanicTrainData$pclass, shade = TRUE, 
@@ -125,21 +127,42 @@ model <- glm(survived~I(log(age)) + sex + fare + pclass +  sibsp,data=titanicTra
 testModel()
 model <- glm(survived~I(log(age)) + sex + fare * pclass +  sibsp,data=titanicTrainData, family=binomial("logit"))
 model <- glm(survived~I(log(age)) + sex + pclass +  sibsp,data=titanicTrainData, family=binomial("logit"))
+model <- glm(survived~I(log(age)) + sex + sex:pclass +  sibsp,data=titanicTrainData, family=binomial("logit"))
 testModel()
 print("Testdaten: 0.751% korrekte Vorhersagen")
 summary(model)
 #verbesserung durch konditionierung an einer variable
+library(lmer4)
 
-modelDropAge <- glm(survived~ sex + pclass +  sibsp,data=titanicTrainData, family=binomial("logit"))
-titanicTestData$dropAgeSurvived = sapply(predict(modelDropAge, type="response", newdata=titanicTestData,na.action=na.exclude),threshold)
+
 
 
 #titanicTestData[is.na(titanicTestData)] <- 0
 #bad choice
 #titanicTestData <- na.omit(titanicTestData)
+model <- glm(survived ~ age + sex + I(pclass==1) 
+             + I(pclass==2),data=titanicTrainData, 
+             family=binomial("logit"))
+modelDropAge <- glm(survived ~sex + I(pclass==1) 
+                    + I(pclass==2),data=titanicTrainData, 
+                    family=binomial("logit"))
+testModel()
 
-predict(model, type="response", newdata=titanicTestData,na.action=na.pass)
+model <- glm(survived ~ I(log(age)) + pclass:sex + sibsp,data=titanicTrainData, 
+             family=binomial("logit"))
+modelDropAge <- glm(survived~ sex + pclass:sex +  sibsp,data=titanicTrainData, family=binomial("logit"))
+titanicTestData$dropAgeSurvived = sapply(predict(modelDropAge, type="response", newdata=titanicTestData,na.action=na.exclude),threshold)
+testModel()
+summary(model)
+
+titanicTrainData$family <- sapply(titanicTrainData$family, function(x){if(x==0) {return(FALSE)} else {return(TRUE)}})
+titanicTrainData$family <- as.factor(titanicTrainData$family)
+plot(survived ~ family, data = titanicTrainData)
+
+mosaic(survived~ sex + pclass, data=titanicTrainData,)
 titanicTestPrediction = sapply(predict(model, type="response", newdata=titanicTestData,na.action=na.pass),threshold)
+
+
 
 titanicTestPrediction <- takeFrom(titanicTestPrediction, titanicTestData$dropAgeSurvived)
 write.csv(titanicTestPrediction, "~/Dropbox/UNISem5/MaschinellesLernen/regression/titanicTestPrediction.csv", row.names=FALSE)

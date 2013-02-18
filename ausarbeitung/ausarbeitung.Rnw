@@ -1,3 +1,4 @@
+%TODO: Rechtschreibprüfung
 \documentclass[a4paper]{tufte-handout}
 
 %load packages
@@ -21,7 +22,6 @@
 #options(width=100)
 options(continue=" ")
 options(prompt=">")
-source("regressionFunctions.R")
 @
 
 
@@ -87,7 +87,7 @@ so lassen sich die Datenpunkte wie in Abbildung \ref{fig:PlotProfitData} darstel
 Die Hausgröße ist hier beispielsweise erklärendes Merkmal der Preis ist das Zielmerkmal. 
 Da es nur ein erklärendes Merkmal $x_1$ gibt, kann man die Hypothese als Geradengleichung auffassen, bei der Achsenabschnitt $\theta_0$ und Steigung $\theta_1$ gefunden worden sind.
 <<loadProfitData, echo=false>>=
-profitData <- read.table("ex1data2.txt", 
+profitData <- read.table("../data/houseprices.txt", 
                             header=TRUE, sep=",")
 @
 <<displayProfitData, fig=true, echo=false, include=false>>=
@@ -150,6 +150,9 @@ h_\theta(x) = g(\theta^Tx) = p = \mathbb{E}(y|x)
 \]
 
 <<sigmoidFunction, fig=true, echo=false, include=false>>=
+g <- function(z) {
+    return(1/(1+exp(-z)))
+}
 par(cex.lab=2.0)
 par(cex.axis=2.0)
 plot(g, xlim=c(-5,5), ylim=c(-0.1, 1.2), xlab="z", ylab="g(z)", yaxt="n",xaxt="n")
@@ -186,7 +189,7 @@ t(x) = \begin{cases}
 Zur Klassifikation mehrer Variablen wird die sogenannte einer-gegen-alle Klassifikation angewandt, indem für jede Klasse $i$ für die Wahrscheinlichkeit, dass $y=i$ eine Hypothese $h_\theta^{(i)}(x)$ aufgestellt wird \citep[Lecture 6]{MLcoursera} 
 
 <<loadAdmissionData,echo=FALSE>>=
-admissionData <- read.table("admissionData.txt",header=TRUE,sep=",")
+admissionData <- read.table("../data/admissionData.txt",header=TRUE,sep=",")
 admissionData$admitted <- as.factor(admissionData$admitted)
 @
 <<admissionModel, echo=false>>=
@@ -260,7 +263,7 @@ Sucht man nun das Maximum dieser Funktion \citep[Kapitel 9.3.1]{fahrmeir} jeweil
 Merkmale und dem Parametervektor $\theta$. 
 Zielvariable $y$ ist normalverteilt, wobei der Erwartungswert der Hypothese entspricht. 
 \begin{marginfigure}
-    \includegraphics[scale=0.4]{regressionMLAssumption}
+    \includegraphics[scale=0.4]{../BishopPic/regressionMLAssumption}
     \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \citep[Figure 1.16]{bishop}}
     \label{fig:regressionMLAssumption}
 \end{marginfigure}
@@ -308,6 +311,10 @@ Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix ein
 Es findet das Minimum der Kostenfunktion dadurch, dass iterativ so lange in Richtung des Gefälles der Funktion abgestiegen wird, bis der Werteunterschied so gering ist, dass man sich sicher in der Nähe des Minimums befindet: \\
 
 <<plotCostFunction, fig=true, echo=false, include=false>>=
+J <- function(X, y, theta) {
+    m <- length(y)
+    return(sum(((X%*%theta)-y)^2)/(2*m))
+}
 endValue <-function(start, step) {
     return(start+ 199*step)
 }
@@ -357,15 +364,20 @@ Bei der logistischen Regression wendet man nicht die kleinste Quadrate Kostenfun
 Stattdessen ist folgende Kostenfunktion üblich:
 
 <<logFunction1, fig=true, echo=false, include=false,width=4,height=4>>=
+log1 <- function(x) {
+    return(-log(x))
+}
 par(cex.lab=1.5)
 par(mfrow=c(1,1))
 plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
 #plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
 @
 <<logFunction2, fig=true, echo=false, include=false,width=4,height=4>>=
+log2 <- function(x) {
+    return(-log(1 - x))
+}
 par(cex.lab=1.5)
 par(mfrow=c(1,1))
-
 plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
 @
 \begin{marginfigure}
@@ -504,8 +516,8 @@ threshold <- function(x) {
   else{return(0)}
 }
 #read dataset
-titanicTrainData <- read.csv("titanicTrain.csv")
-titanicTestData <- read.csv("titanicTest.csv")
+titanicTrainData <- read.csv("../data/titanicTrain.csv")
+titanicTestData <- read.csv("../data/titanicTest.csv")
 #omit columns
 titanicTrainData <- titanicTrainData[,!names(titanicTrainData) %in% c("name")]
 titanicTrainData <- titanicTrainData[,!names(titanicTrainData) %in% c("ticket")]
@@ -538,6 +550,7 @@ par(cex.axis=1.8)
 plot(survived~age,data=titanicTrainData)
 @
 <<plotTitanicSex, echo=false, include=false, fig=true>>=
+library(vcd)
 mosaic(survived~sex, data=titanicTrainData,shade = TRUE, 
        labeling_args=list(gp_labels=gpar(fontsize=20),
                           gp_varnames=gpar(fontsize=22)),
@@ -613,7 +626,8 @@ mosaic(survived~ sex + pclass, data=titanicTrainData,
        legend_args=list(fontsize=16),
        margins=unit(4, "lines"),
        legend_width=unit(7, "lines"))
-titanicTestPrediction = sapply(predict(model, type="response", newdata=titanicTestData,na.action=na.pass),threshold)
+    titanicTestPrediction = sapply(predict(model, type="response", newdata=titanicTestData,na.action=na.pass),threshold)
+
 @
 
 \begin{marginfigure}
@@ -683,7 +697,7 @@ Eine Erklärung für das schlechte Abschneiden der logistischen Regression in di
 
 
 \bibliographystyle{abbrvnat}
-\bibliography{regressionLib}
+\bibliography{../regressionLib}
 \nocite{*}
 
 \end{document}

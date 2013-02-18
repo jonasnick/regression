@@ -35,7 +35,7 @@ source("regressionFunctions.R")
 \begin{frame}[plain]{}
 \titlepage
 <<loadProfitData, echo=false>>=
-profitData <- read.table("ex1data2.txt", 
+profitData <- read.table("../data/houseprices.txt", 
                             header=TRUE, sep=",")
 @
 <<displayHead, echo=false>>=
@@ -168,7 +168,7 @@ Beispiel:
 \subsection{Logistische Regression}
 \begin{frame}[fragile]{Logistische Regression}
 <<loadAdmissionData,echo=FALSE>>=
-admissionData <- read.table("admissionData.txt",header=TRUE,sep=",")
+admissionData <- read.table("../data/admissionData.txt",header=TRUE,sep=",")
 admissionData$admitted <- as.factor(admissionData$admitted)
 @
 <<sigmoidFunction, fig=true, echo=false, include=false,width=4,height=4>>=
@@ -504,15 +504,11 @@ p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
 \subsection{Titanic}
 \begin{frame}[fragile]{Datensatz}
 <<loadTitanicData, echo=false>>=
-titanicTrainData <- read.csv("titanicTrain.csv")
-titanicTestData <- read.csv("titanicTest.csv")
+titanicTrainData <- read.csv("../data/titanicTrain.csv")
 titanicTrainData <- titanicTrainData[,!names(titanicTrainData) %in% c("name")]
 titanicTrainData$pclass <- as.factor(titanicTrainData$pclass)
 titanicTrainData$embarked <- as.factor(titanicTrainData$embarked)
 titanicTrainData$sex <- as.factor(titanicTrainData$sex)
-titanicTestData$pclass <- as.factor(titanicTestData$pclass)
-titanicTestData$sex <- as.factor(titanicTestData$sex)
-titanicTestData$embarked <- as.factor(titanicTestData$embarked)
 titanicTrainTest <- titanicTrainData
 titanicTrainData$survived <- as.factor(titanicTrainData$survived)
 
