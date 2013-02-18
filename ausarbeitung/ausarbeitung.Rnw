@@ -1,23 +1,26 @@
 %TODO: Rechtschreibprüfung
-\documentclass[a4paper]{tufte-handout}
-
-%load packages
+\documentclass[runningheads,a4paper]{llncs}
 \usepackage{Sweave}
-\usepackage{amsmath}
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
 \usepackage{graphicx}
-\usepackage{alltt}
-\usepackage[ngerman]{babel}
 \usepackage[utf8]{inputenc}
 
+%load packages
+\usepackage{amsmath}
+%\usepackage{graphicx}
+%\usepackage{alltt}
+\usepackage[german]{babel}
+
 % Larger font sizes (from size12.clo)
-\makeatletter% allows us to use macros with @ in their names
-\renewcommand\LARGE{\@setfontsize\LARGE\@xxpt{23}}
-\renewcommand\huge{\@setfontsize\huge\@xxvpt{25}}
-\makeatother% restores meaning of @
+%\makeatletter% allows us to use macros with @ in their names
+%\renewcommand\LARGE{\@setfontsize\LARGE\@xxpt{23}}
+%\renewcommand\huge{\@setfontsize\huge\@xxvpt{25}}
+%\makeatother% restores meaning of @
 
 %R options
-\fvset{listparameters={\setlength{\topsep}{0pt}}}
-\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+%\fvset{listparameters={\setlength{\topsep}{0pt}}}
+%\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
 <<echo=false>>=
 #options(width=100)
 options(continue=" ")
@@ -25,7 +28,7 @@ options(prompt=">")
 @
 
 
-\let\subsubsection\subsection% this is just so that the blindtext package doesn't complain about the lack of a \subsubsection
+%\let\subsubsection\subsection% this is just so that the blindtext package doesn't complain about the lack of a \subsubsection
 
 %customize bib
 %\makeatletter
@@ -41,23 +44,22 @@ options(prompt=">")
 \maketitle
 
 
-\chapter
 \begin{abstract}
 \noindent
 Die folgende Arbeit führt in Regressionsmodelle, wie lineare, nichtlineare und logistische Regression ein. Anschließend werden die zugehörigen Kostenfunktionen mit der Maximum Likelihood Methode und Bayes Inferenz bestimmt und Verfahren zu ihrer Optimierung vorgestellt. Zum Schluss wird die praktische Anwendung auf einen wirklichen Datensatz gezeigt.
 \end{abstract}
 
 \section{Problembeschreibung}
-Charakteristisch für überwachtes maschinelles Lernen, zu der auch die Regression gehört, ist das Beschreiben der Beziehung von Zielvariable und erklärender Variable\sidenote{werden auch abhängige und unabhängige Variable oder Prädiktor genannt} aus vorliegenden Daten, also Realisierungen von Zufallsvariablen.  Folgende Notation wird für die Daten genutzt:
+Charakteristisch für überwachtes maschinelles Lernen, zu der auch die Regression gehört, ist das Beschreiben der Beziehung von Zielvariable und erklärender Variable\footnote{werden auch abhängige und unabhängige Variable oder Prädiktor genannt} aus vorliegenden Daten, also Realisierungen von Zufallsvariablen.  Folgende Notation wird für die Daten genutzt:
 \[
 x = \begin{bmatrix} 1\\x_1\\x_2\\\vdots\\x_n \end{bmatrix} \in \mathbb{R}^{n},
 \:\: y \in \mathbb{R} \land y \in G (Gruppen)
 \]
 Hierbei bezeichnet $x$ einen Vektor von $n$ erklärenden Merkmalen und $y$ ein Zielmerkmal. Bei der Regression sind also die Daten aus einem metrischen Raum, wobei das Zielmerkmal auch auf der Nominalskala sein kann, wie später bei der logistischen Regression gezeigt wird. 
-\sidenote{Es kann sich auch um einen Vektor von Zielvariablen handeln. Das wird hier jedoch nicht weiter behandelt.} 
+\footnote{Es kann sich auch um einen Vektor von Zielvariablen handeln. Das wird hier jedoch nicht weiter behandelt.} 
 Wie sich gleich zeigen wird, ist es außerdem günstig $x_0$ als $1$ zu definieren. 
 
-\newthought{Das Regressionsmodell} stellt $y$ durch die Summe einer Hypothese von $x$ und einem Fehlerterm $\epsilon$ dar.
+Das Regressionsmodell stellt $y$ durch die Summe einer Hypothese von $x$ und einem Fehlerterm $\epsilon$ dar.
 \[
 y = h(x) + \epsilon
 \]
@@ -102,11 +104,11 @@ axis(2, at=c(ymin, (ymin+ymax)/2, ymax))
 model<-lm(price~house_size,data=profitData)
 abline(model)
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=1.0]{ausarbeitung-displayProfitData}
     \caption{Lineare Regression, Preis abhängig von Hausgröße}
     \label{fig:PlotProfitData}
-\end{marginfigure}
+\end{figure}
 
 
 \subsection{Nichtlineare Regression}
@@ -127,13 +129,13 @@ model<-nls(y~a + c*x^(-d),data=Data, start = list(a=80, c=20, d=0.2))
 lines(Data$x, predict(model))
 @
 
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotNonLinearData}
     \caption{Nichtlineare Regression mit Basisfunktionen: 
                             $\phi_1(x) = x_1$,
                             $\phi_2(x) = x_1^-0.2$}
     \label{fig:NonLinearRegression}
-\end{marginfigure}
+\end{figure}
 
 
 \subsection{Logistische Regression}
@@ -144,7 +146,7 @@ Wenn die erklärenden Variablen $x$ vorliegen folgt die abhangige Variable $y$ d
 y&\in\left\{{0,1}\right\}\\
 y|x &\sim Bernoulli(p)
 \end{align*}
-Die Hypothese ähnelt den vorangegangen, nur wird die bisherige lineare Hypothese\sidenote{Nichtlineare Hypothesen sind auch möglich, werden hier jedoch nicht im Speziellen behandelt} mithilfe einer Verbindungsfunktion $g$ in die kontinuierliche Menge $[0,1]$ abgebildet, um diese als Wahrscheinlichkeit für Erfolg zu interpretieren. 
+Die Hypothese ähnelt den vorangegangen, nur wird die bisherige lineare Hypothese\footnote{Nichtlineare Hypothesen sind auch möglich, werden hier jedoch nicht im Speziellen behandelt} mithilfe einer Verbindungsfunktion $g$ in die kontinuierliche Menge $[0,1]$ abgebildet, um diese als Wahrscheinlichkeit für Erfolg zu interpretieren. 
 Da $y$ Bernoulli verteilt ist, ist diese Wahrscheinlichkeit auch gleich dem Erwartungswert für $y$.
 \[
 h_\theta(x) = g(\theta^Tx) = p = \mathbb{E}(y|x)
@@ -164,17 +166,17 @@ axis(1, at=axeY, labels=axeY)
 abline(v=0)
 @
 
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-sigmoidFunction}
     \caption{Logistische Funktion}
     \label{fig:Logitfunction}
-\end{marginfigure}
+\end{figure}
 
 Die angesprochene Verbindungsfunktion, ist hier die namensgebende logistische Funktion (Abbildung \ref{fig:Logitfunction}). 
 \[
 g(z) = \frac{1}{1+e^{-z}}
 \]
-Die Hypothese hat nun genau die Eigenschaft dass ihre logarithmierten Odds\sidenote{Odds ist eine Möglichkeit Wahrscheinlichkeiten $p$ anzugeben und folgendermaßen definiert: $\frac{p}{1-p}$} (logit) $\pi(x)$ äquivalent zur linearen Regressionshypothese ist.
+Die Hypothese hat nun genau die Eigenschaft dass ihre logarithmierten Odds\footnote{Odds ist eine Möglichkeit Wahrscheinlichkeiten $p$ anzugeben und folgendermaßen definiert: $\frac{p}{1-p}$} (logit) $\pi(x)$ äquivalent zur linearen Regressionshypothese ist.
 \[
 \pi(x) = \ln\frac{h_\theta(x)}{1-h_\theta(x)}=\theta^Tx
 \]
@@ -187,7 +189,7 @@ t(x) = \begin{cases}
             \end{cases}
 \end{equation*}
 
-Zur Klassifikation mehrer Variablen wird die sogenannte einer-gegen-alle Klassifikation angewandt, indem für jede Klasse $i$ für die Wahrscheinlichkeit, dass $y=i$ eine Hypothese $h_\theta^{(i)}(x)$ aufgestellt wird \citep[Ch. 2.2]{bishop} 
+Zur Klassifikation mehrer Variablen wird die sogenannte einer-gegen-alle Klassifikation angewandt, indem für jede Klasse $i$ für die Wahrscheinlichkeit, dass $y=i$ eine Hypothese $h_\theta^{(i)}(x)$ aufgestellt wird \cite[Ch. 2.2]{bishop} 
 
 <<loadAdmissionData,echo=FALSE>>=
 admissionData <- read.table("../data/admissionData.txt",header=TRUE,sep=",")
@@ -209,11 +211,11 @@ xyplot(exam1 ~ exam2, data=admissionData,xlab="Klausur 1", ylab="Klausur 2", gro
                 panel.abline(intercept,slope)
                 })
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-admissionDataGLM}
     \caption{Entscheidungsgrenze für Zulassung von Studenten, basierend auf Klausurnoten}
     \label{fig:DecisionBoundary}
-\end{marginfigure}
+\end{figure}
 
 Aus den Koeffizienzen lässt sich dann eine Entscheidungsgrenze berechnen. Da $\theta^Tx>0 \Leftrightarrow y=1$ lässt sich als Entscheidungsgrenze eine n-1 dimensionale Hyperebene berechnen. Sie teilt den Raum der erklärenden Variablen in zwei Halbräume, die jeweils eine Kategorie von $y$ repräsentieren. \footnote{Beispiel mit zwei erklärenden Variablen $x_1$ und $x_2$ (Abbildung \ref{fig:DecisionBoundary}):
 \begin{align*}
@@ -256,17 +258,17 @@ Will man beispielsweise Erwartungswert $\mu$ sowie Standardabweichung $\sigma$ a
 L(\mu,\sigma) = p(d|\mu,\sigma) = \mathcal{N}(\mu, \sigma) = 
     \frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{(d-\mu)^2}{2\sigma^2})
 \]
-Sucht man nun das Maximum dieser Funktion \citep[Kapitel 9.3.1]{fahrmeir} jeweils für $\mu$ und $\sigma$, so landet man bei den bekannten Formeln für Mittelwert und Standardabweichung.
-\sidenote{\[\mu=\bar{x}=\frac{1}{n}\sum_{i=1}^{n}\]\[\sigma=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})}\]}
+Sucht man nun das Maximum dieser Funktion \cite[Kapitel 9.3.1]{fahrmeir} jeweils für $\mu$ und $\sigma$, so landet man bei den bekannten Formeln für Mittelwert und Standardabweichung.
+\footnote{\[\mu=\bar{x}=\frac{1}{n}\sum_{i=1}^{n}\]\[\sigma=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})}\]}
 
-\newthought{Die Anwendung der Maximum Likelihood} auf das Regressionsproblem erfordert folgende Annahme über die Verteilung der Zielvariable $y$ gegeben der erklärenden
+Die Anwendung der Maximum Likelihood auf das Regressionsproblem erfordert folgende Annahme über die Verteilung der Zielvariable $y$ gegeben der erklärenden
 Merkmale und dem Parametervektor $\theta$. 
 Zielvariable $y$ ist normalverteilt, wobei der Erwartungswert der Hypothese entspricht. 
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{../BishopPic/regressionMLAssumption}
-    \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \citep[Figure 1.16]{bishop}}
+    \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \cite[Figure 1.16]{bishop}}
     \label{fig:regressionMLAssumption}
-\end{marginfigure}
+\end{figure}
 Man findet nun die Hypothese, gemäß deren die Realisierung des Zielmerkmals möglichst wahrscheinlich ist.  (Abbildung \ref{fig:regressionMLAssumption}). 
 \[
 L(\theta) = p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)
@@ -298,7 +300,7 @@ Daher bildet man die partielle Ableitung von $J(\theta)$ für jeden Parameter $\
 \,x_j^{(i)} \stackrel{!}{=} 0 \\
 \end{align*}
 Durch Einsetzen der linearen Hypothese und Umformen in Matrixschreibweise erhält man ein lineares System von Normalgleichungen, mit dem sich
-der Parametervektor direkt berechnen lässt \citep[Ch. 3.1.1]{bishop}.
+der Parametervektor direkt berechnen lässt \cite[Ch. 3.1.1]{bishop}.
 \begin{align*}
 \Rightarrow \theta  &=X^{+}y \\
                     &=(X^TX)^{-1}X^Ty
@@ -307,7 +309,7 @@ $X^{+}$ bezeichnet hier die \emph{Moore-Penrose Pseudoinverse} von $X$, die das 
 Es kann allerdings vorkommen, dass $X^TX$ nicht invertierbar ist - häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
 
 \subsection{Gradientenverfahren}
-Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \citep[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
+Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \cite[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
 Es findet das Minimum der Kostenfunktion dadurch, dass iterativ so lange in Richtung des Gefälles der Funktion abgestiegen wird, bis der Werteunterschied so gering ist, dass man sich sicher in der Nähe des Minimums befindet: \\
 
 <<plotCostFunction, fig=true, echo=false, include=false>>=
@@ -339,11 +341,11 @@ palette(gray(seq(0,1.0,len=10))) #gray scales; print old palette
 image(theta1, theta2, costs, col=palette(), axes=FALSE)
 contour(theta1, theta2, costs, add=TRUE, col="black")
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotCostFunction}
     \caption{Kostenfunktion der Hauspreis Regression (Abbildung \ref{fig:PlotProfitData})}
     \label{fig:PlotCostFunction}
-\end{marginfigure}
+\end{figure}
 
 \vspace{0.5cm}
 repeat until convergence \{\\
@@ -354,7 +356,7 @@ Die Parameter $\theta_j$ sind anfangs zufällig initialisiert.
 Wichtig ist die Wahl der Lernrate $\alpha$, die bestimmt wie weit in der Funktion gesprungen wird. 
 Falls nämlich $\alpha$ zu groß gewählt wurde, so kann es sein, dass der Algorithmus systematisch das Minimum überspringt und der Algorithmus daher nicht konvergiert.
 Falls das Gradientenverfahren ein Minimum findet, so ist es global, da die maximum likelihood Kostenfunktion für lineare 
-Regression konvex ist. \citep[Ch. 1.6.1]{bishop}
+Regression konvex ist. \cite[Ch. 1.6.1]{bishop}
 
 Es gibt elaboriertere Optimierungsverfahren, wie konjugierte Gradienten oder das BFGS Verfahren, die keine explizite Lernrate benötigen und unter Umständen schneller konvergieren.
 
@@ -379,17 +381,17 @@ par(cex.lab=1.5)
 par(mfrow=c(1,1))
 plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-logFunction1}
     \caption{Logistische Kostenfunktion für $y=1$}
     \label{fig:logFunction1}
-\end{marginfigure}
+\end{figure}
 
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-logFunction2}
     \caption{Logistische Kostenfunktion für $y=0$}
     \label{fig:logFunction2}
-\end{marginfigure}
+\end{figure}
 
 \[
 J(\theta) = \frac{1}{m}\sum_{i=1}^{m}Cost(h_\theta(x^{(i)}),y^{(i)})
@@ -418,7 +420,7 @@ Bei der Maximum Likelihood Methode wird der Parameter so gewählt, dass die vorl
 Tatsächlich wäre es aber umgekehrt wesentlich intuitiver, den Parameter zu wählen, der unter den vorliegenden Daten am wahrscheinlichsten ist (a posteriori Wahrscheinlichkeit). Dieses Vorgehen ist mit Bayes Inferenz möglich.
 Wie gehabt sei $p(D|\delta)$ die Wahrscheinlichkeitsdichte der Daten $\mathcal{D}$, gegeben Parameter $\delta$, und $L(\delta) = p(\mathcal{D}|\delta)$ die Likelihoodfunktion. 
 
-\newthought{Die Erweiterung ist,} dass für das unbekannte $\delta$ eine a priori Dichte 
+Die Erweiterung ist, dass für das unbekannte $\delta$ eine a priori Dichte 
 \[
 p(\delta)
 \]
@@ -473,18 +475,18 @@ lines(
     predict(model), lwd=1)
 #curve(sum(summary(model)$coefficients * c(1, x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9)), add=T) #5.097075e+07+-2.381713e+05*x+4.739686e+02*x^2,add=T)
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotOverfitting}
     \caption{Polynomielle Regression 10. Grades des Hauspreises ohne Regularisierung}
     \label{fig:plotOverfitting}
-\end{marginfigure}
+\end{figure}
 Es gibt eine handvoll von Regularisierungsverfahren, aber eine gängige Erweiterung wird \emph{Tikhonov Regularisierung} genannt. Angewandt auf die kleinste Quadrate Kostenfunktion bedeutet folgendes:
 \[
 J(\theta) = \frac{1}{2m}\sum_{i=1}^{m}(h_\theta(x^{(i)})-y^{(i)})^2 + \lambda\sum_{j=1}^{n}\theta_j^2
 \]
-Der Koeffizient $\lambda$ beschreibt die relative Wichtigkeit des Regularisierungsterms im Vergleich zu den Fehlerquadraten und wird beispielsweise mit Kreuzvalidierung gefunden. Für diese Kostenfunktionen lässt sich das Minimum analog mit Normalgleichung oder Gradientenabstieg berechnen \citep[Ch. 1.1]{bishop}. 
+Der Koeffizient $\lambda$ beschreibt die relative Wichtigkeit des Regularisierungsterms im Vergleich zu den Fehlerquadraten und wird beispielsweise mit Kreuzvalidierung gefunden. Für diese Kostenfunktionen lässt sich das Minimum analog mit Normalgleichung oder Gradientenabstieg berechnen \cite[Ch. 1.1]{bishop}. 
 
-\newthought{Vorraussage eines neuen} $y$, basierend auf neuen erklärenden Merkmalen $x$ und vorherigen Daten $X$ und $Y$ war ein anfänglich gestelltes Problem. 
+Vorraussage eines neuen $y$, basierend auf neuen erklärenden Merkmalen $x$ und vorherigen Daten $X$ und $Y$ war ein anfänglich gestelltes Problem. 
 Mit Bayes'schen Mitteln lässt sich dazu die a posteriori Dichte des Zielmerkmals ermitteln. Diese wird durch Herausmarginalisieren von $\theta$ aus den bekannten Wahrscheinlichkeitsdichten berechnet:
 \[
 p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
@@ -500,7 +502,7 @@ Aus dieser Dichte lässt sich nun dasjenige $y$ mit der höchsten Wahrscheinlich
 \item Bayes Regression nimmt eine a priori Verteilung der Koeffizienten $\theta$ an, wodurch sich Überanpassung teilweise vermeiden lässt.
 
 \section{Anwendung: Titanic-Datensatz}
-Ein häufig angewandter Demonstrationsdatensatz für Klassifikationen ist eine Studie über das Sinken der Titanic \citep{titanicDataset}
+Ein häufig angewandter Demonstrationsdatensatz für Klassifikationen ist eine Studie über das Sinken der Titanic \cite{titanicDataset}
 , in dem für 1309 Passagiere jeweils angegeben ist, ob er überlebt hat, sowie zusätzliche Informationen über den Passagier, 
 wie ökonomischer Status (Beförderungsklasse, \texttt{pclass}), Geschlecht (\texttt{sex}), Alter (\texttt{age}), Anzahl der Geschwister an Bord (\texttt{sibsp}) und Anzahl der Eltern an Bord (\texttt{parch}). 
 
@@ -563,28 +565,28 @@ mosaic(survived~pclass, data=titanicTrainData, shade = TRUE,
        legend_width=unit(7, "lines"))
 
 @
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotTitanicClass}
     \caption{Mosaikplot Überleben gegeben Beförderungsklasse}
     \label{fig:PlotSurvivalClass}
-\end{marginfigure}
-\begin{marginfigure}
+\end{figure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotTitanicSex}
     \caption{Mosaikplot Überleben gegeben Geschlecht}
     \label{fig:PlotSurvivalSex}
-\end{marginfigure}
-\begin{marginfigure}
+\end{figure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotTitanicAge}
     \caption{Mosaikplot Überleben gegeben Alter}
     \label{fig:PlotSurvivalAge}
-\end{marginfigure}
+\end{figure}
 
 <<printTitanicData,echo=false>>=
 head(titanicTrainData)
 @
 Die Untersuchung des Datensatzes ist historisch motiviert und kann Aufschluss über soziale Struktur der damaligen Gesellschaft und den ungefähren Ablauf der Katastrophe geben. 
 Anhand der Abbildungen \ref{fig:PlotSurvivalClass}, \ref{fig:PlotSurvivalSex} und \ref{fig:PlotSurvivalAge} kann man erkennen, dass Passagiere mit hohem ökonomischer Status , Frauen und Kinder eher überlebt haben. Mit diesen drei erklärenden Variablen werden nun im Folgenden
-mithilfe der Open Source Statistik Software R \citep{R} eine logistische Regression durchgeführt.
+mithilfe der Open Source Statistik Software R \cite{R} eine logistische Regression durchgeführt.
 
 <<fitFirstModel, echo=true>>=
 model <- glm(survived ~ age + sex + I(pclass==1) 
@@ -605,10 +607,10 @@ summary(model)
 Hier sind zunächst die Quantile der Residuen oder Fehler $\epsilon$ aufgetragen. Diese sollten einen Median Nahe $0$ haben und bei linearer Regression annähernd normalverteilt sein. 
 Dann sieht man zeilenweise Achsenabschnitt und die erklärenden Merkmale, wobei die erste Spalte (unter \texttt{Estimate}) genau der ermittelte $\theta$ Vektor ist. 
 Diese sind allerdings im Gegensatz bei der logistischen Regression nicht sehr einfach zu interpretieren. Betrachtet man zum Beispiel Geschlecht, so wird im Falle des Mannes etwa 2.5 vom linearen Modell subtrahiert, hat daher nach der logistischen Transformation eine geringere Wahrscheinlichkeit für `Erfolg' und spiegelt wider, dass Männer eher seltener überlebt haben. 
-Genauer: die Koeffizienten sind logarithmische Quotenverhältnisse (Odds ratio) und geben an, wie sich die log-Odds für `Erfolg' mit jeder Veränderung der erklärenden Variable ändert. \citep[S.47]{hosmer:logistic}
+Genauer: die Koeffizienten sind logarithmische Quotenverhältnisse (Odds ratio) und geben an, wie sich die log-Odds für `Erfolg' mit jeder Veränderung der erklärenden Variable ändert. \cite[S.47]{hosmer:logistic}
 Das heisst im Falle männlich ändert sich die Odds der Wahrscheinlichkeit zu überleben um den Faktor $e^{-2.522781}\approx0.08$\\
 Die folgenden Spalten geben Standardfehler, z-Werte und die Wahrscheinlichkeit mit der sich das geschätzte $\theta$ für die Variable von $0$ unterscheidet.
-\texttt{Null deviance} repräsentiert die Abweichung des Modells von den realen Daten ohne unabhängige Variablen (Null Modell) und \texttt{Residual deviance} hängt von der Summe der Residuale des gesamten Modells ab \citep[S. 217]{baayen2008}. \texttt{AIC} ist das Akaike Information Criterion und stellt ein wichtiges Kriterium zur Auswahl des Modells dar, da sowohl Anpassungsgüte, als auch Komplexität des Modells (siehe Overfitting) in die Beurteilung mit einfließt. Es sollte möglichst klein sein, da es den Verlust von Information darstellt. 
+\texttt{Null deviance} repräsentiert die Abweichung des Modells von den realen Daten ohne unabhängige Variablen (Null Modell) und \texttt{Residual deviance} hängt von der Summe der Residuale des gesamten Modells ab \cite[S. 217]{baayen2008}. \texttt{AIC} ist das Akaike Information Criterion und stellt ein wichtiges Kriterium zur Auswahl des Modells dar, da sowohl Anpassungsgüte, als auch Komplexität des Modells (siehe Overfitting) in die Beurteilung mit einfließt. Es sollte möglichst klein sein, da es den Verlust von Information darstellt. 
 <<plotFamily,fig=true, echo=false, include=false>>=
 titanicTrainData$family <- sapply(titanicTrainData$sibsp, function(x){if(x==0) {return(FALSE)} else {return(TRUE)}})
 titanicTrainData$family <- as.factor(titanicTrainData$family)
@@ -626,16 +628,16 @@ mosaic(survived~ sex + pclass, data=titanicTrainData,
 
 @
 
-\begin{marginfigure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotFamily}
     \caption{Mosaikplot: Überleben gegeben Geschwister an Bord}
     \label{fig:PlotFamily}
-\end{marginfigure}
-\begin{marginfigure}
+\end{figure}
+\begin{figure}
     \includegraphics[scale=0.4]{ausarbeitung-plotSurvivedSexClass}
     \caption{Mosaikplot: Überleben gegeben Geschlecht und Beförderungsklasse}
     \label{fig:PlotSurvivedSexClass}
-\end{marginfigure}
+\end{figure}
 
 <<analyseFirstModel,echo=true>>=
 cat(testModel())
@@ -647,7 +649,7 @@ Diese Präzision auf dem Testdatensatz lässt darauf schließen, dass die drei b
 
 
 
-\newthought{Zur Verbesserung des Modells} werden wir den Datensatz noch etwas genauer anschauen. 
+Zur Verbesserung des Modells werden wir den Datensatz noch etwas genauer anschauen. 
 In Abbildung \ref{fig:PlotSurvivalAge} erkennt man, dass die Beziehung zwischen Alter und Überleben nicht linear ist, sondern eher logarithmisch oder polynomiell. 
 Abbildung \ref{fig:PlotFamily} zeigt, dass Personen mit Geschwistern an Bord eher überlebt haben. 
 Desweiteren sieht man in Abbildung \ref{fig:PlotSurvivedSexClass}, dass eine Interaktion zwischen Geschlecht und Beförderungsklasse vorliegt, beispielsweise haben Frauen in der zweiten Klasse im Gegensatz zu Männern ähnlich häufig überlebt wie in der ersten Klasse.
@@ -667,7 +669,7 @@ summary(model)
 @
 \end{small}
 Der Interaktionsterm wird durch einen Doppelpunkt spezifiziert und bewirkt, dass für jede Kombination von Geschlecht und Beförderungsklasse ein Koeffizient geschätzt wird der auf die log-Odds addiert wird, wenn die Kombination zutrifft. 
-Fast alle unabhängigen Variablen sind signifikant\sidenote{\texttt{NA} bedeutet not available, warum die Koeffizienten nicht ermittelt werden können ist mir noch nicht bekannt.}, die Residual deviance hat sich stark verkleinert, ebenso wie der AIC.
+Fast alle unabhängigen Variablen sind signifikant\footnote{\texttt{NA} bedeutet not available, warum die Koeffizienten nicht ermittelt werden können ist mir noch nicht bekannt.}, die Residual deviance hat sich stark verkleinert, ebenso wie der AIC.
 Die Funktion drop1 berechnet Residual deviance und AIC wenn jeweils eine Variable fehlt.
 <<analyseLogAgeModel,echo=true>>=
 drop1(model)
@@ -681,9 +683,9 @@ cat("Testdaten: 74.6% korrekte Vorhersagen")
 @
 
 %precision recall?
-\newthought{Zusammenfassend} lässt sich sagen, dass das zweite Modell überangepasst ist, da es zwar auf dem Trainingsdatensatz bessere Ergebnisse erzielt, aber auf dem Testdatensatz schlechter als das einfachere Modell abschneidet. 
+Zusammenfassend lässt sich sagen, dass das zweite Modell überangepasst ist, da es zwar auf dem Trainingsdatensatz bessere Ergebnisse erzielt, aber auf dem Testdatensatz schlechter als das einfachere Modell abschneidet. 
 Allerdings ist auch das Modell nicht zufriedenstellend. 
-Denn eine sehr naive Klassifikation, bei der Frauen immer überleben und Männer nie überleben hat eine höhere Präzision, nämlich $76,5\%$. \sidenote{\url{https://www.kaggle.com/c/titanic-gettingStarted/leaderboard}}
+Denn eine sehr naive Klassifikation, bei der Frauen immer überleben und Männer nie überleben hat eine höhere Präzision, nämlich $76,5\%$. \footnote{\url{https://www.kaggle.com/c/titanic-gettingStarted/leaderboard}}
 Random forests erzielen eine Genauigkeit von $77.5\%$
 Eine Erklärung für das schlechte Abschneiden der logistischen Regression in diesem Vergleich könnte darin liegen, dass auch schon das erste, einfachere Modell überangepasst und deshalb das Naive Modell besser war. Auch scheint Regression generell nicht sehr gut mit faktoriellen erklärenden Variablen zurecht zu kommen, da lediglich der Achsenabschnitt verändert wird, komplexere Interaktionen aber nicht berücksichtigt werden, die beispielsweise Entscheidungsbäume im Allgemeinen besser modellieren. 
 
