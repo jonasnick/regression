@@ -307,7 +307,9 @@ der Parametervektor direkt berechnen lässt \cite[Ch. 3.1.1]{bishop}.
 \end{align*}
 $X^{+}$ bezeichnet hier die \emph{Moore-Penrose Pseudoinverse} von $X$, die das Konzept von Invertierbarkeit auf nichtquadratische Matrizen erweitert und allgemein zum Berechnen von optimalen Lösungen mit kleinster euklidischer Norm bei linearen Ausgleichsproblemen verwendet wird.
 Es kann allerdings vorkommen, dass $X^TX$ nicht invertierbar ist
-\footnote{Beweis:\\Spaltenvektoren von $X$ abhängig $\Rightarrow \det(X)=0 \Rightarrow \det(X^T)\det(X) = 0 \Rightarrow \det(X^TX) = 0 \Rightarrow X^TX$ nicht invertierbar}- häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
+\footnote{Beweis:\\Spaltenvektoren von $X$ abhängig $\Rightarrow \det(X)=0 \\
+\Rightarrow \det(X^T)\det(X) = 0 \Rightarrow \det(X^TX) = 0 \,\, \text{(Produktsatz von Determinanten)}\\
+\Rightarrow X^TX$ nicht invertierbar}- häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
 
 \subsection{Gradientenverfahren}
 Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \cite[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
