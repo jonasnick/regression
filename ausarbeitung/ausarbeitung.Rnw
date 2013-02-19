@@ -19,8 +19,8 @@
 %\makeatother% restores meaning of @
 
 %R options
-%\fvset{listparameters={\setlength{\topsep}{0pt}}}
-%\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
+\fvset{listparameters={\setlength{\topsep}{0pt}}}
+\renewenvironment{Schunk}{\vspace{\topsep}}{\vspace{\topsep}}
 <<echo=false>>=
 #options(width=100)
 options(continue=" ")
@@ -39,7 +39,7 @@ options(prompt=">")
 %: Least-squares, Maximum Likelihood und Bayes}
 %\subtitle{Lineare Regression: Least-squares, Maximum Likelihood und Bayes}
 \author{Jonas Nick}
-
+\institute{Ausarbeitung im Seminar "Maschinelles Lernen"}
 \begin{document}
 \maketitle
 
@@ -94,7 +94,7 @@ profitData <- read.table("../data/houseprices.txt",
                             header=TRUE, sep=",")
 @
 <<displayProfitData, fig=true, echo=false, include=false>>=
-par(cex=1.8)
+par(cex=1.6)
 plot(price~house_size,data=profitData, xlab="Hausgröße",
         yaxt="n",ylab="Preis");
 ymin=min(profitData[,3])
@@ -104,11 +104,7 @@ axis(2, at=c(ymin, (ymin+ymax)/2, ymax))
 model<-lm(price~house_size,data=profitData)
 abline(model)
 @
-\begin{figure}
-    \includegraphics[scale=1.0]{ausarbeitung-displayProfitData}
-    \caption{Lineare Regression, Preis abhängig von Hausgröße}
-    \label{fig:PlotProfitData}
-\end{figure}
+
 
 
 \subsection{Nichtlineare Regression}
@@ -123,20 +119,30 @@ n<-30
 x<-seq(n)
 y<-rnorm(n,50+ 30*x^(-0.2),1)
 Data<-data.frame(x,y)
-par(cex=1.8)
+par(cex=1.6)
 plot(y~x,Data)
 model<-nls(y~a + c*x^(-d),data=Data, start = list(a=80, c=20, d=0.2))
 lines(Data$x, predict(model))
 @
 
 \begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotNonLinearData}
+\begin{minipage}[t]{0.5\textwidth}
+\centering
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-displayProfitData}
+    \caption{Lineare Regression, Preis abhängig von Hausgröße}
+    \label{fig:PlotProfitData}
+
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotNonLinearData}
     \caption{Nichtlineare Regression mit Basisfunktionen: 
                             $\phi_1(x) = x_1$,
-                            $\phi_2(x) = x_1^-0.2$}
+                            $\phi_2(x) = x_1^{-0.2}$}
     \label{fig:NonLinearRegression}
-\end{figure}
+\end{minipage}
 
+\end{figure}
 
 \subsection{Logistische Regression}
 Falls es sich um ein Klassifikationsproblem handelt, das Zielmerkmal also nicht metrisch ist sondern nur abgrenzbare Kategorien annehmen kann, wendet man logistische Regression an. Im folgenden werden wir uns auf zwei Kategorien beschränken.
@@ -156,8 +162,8 @@ h_\theta(x) = g(\theta^Tx) = p = \mathbb{E}(y|x)
 g <- function(z) {
     return(1/(1+exp(-z)))
 }
-par(cex.lab=2.0)
-par(cex.axis=2.0)
+par(cex.lab=1.8)
+par(cex.axis=1.8)
 plot(g, xlim=c(-5,5), ylim=c(-0.1, 1.2), xlab="z", ylab="g(z)", yaxt="n",xaxt="n")
 axeX=seq(0, 1.2, 0.5)
 axis(2, at=axeX, labels=axeX)
@@ -165,12 +171,6 @@ axeY=c(0)
 axis(1, at=axeY, labels=axeY)
 abline(v=0)
 @
-
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-sigmoidFunction}
-    \caption{Logistische Funktion}
-    \label{fig:Logitfunction}
-\end{figure}
 
 Die angesprochene Verbindungsfunktion, ist hier die namensgebende logistische Funktion (Abbildung \ref{fig:Logitfunction}). 
 \[
@@ -200,6 +200,7 @@ mdl <- glm(admitted~exam1+exam2,data=admissionData,
             family="binomial")
 @
 <<admissionDataGLM, fig=true, echo=false, include=false,width=3,height=3>>=
+par(cex=1.7)
 slope <- coef(mdl)[2]/(-coef(mdl)[3])
 intercept <- coef(mdl)[1]/(-coef(mdl)[3])
 library(lattice)
@@ -212,9 +213,17 @@ xyplot(exam1 ~ exam2, data=admissionData,xlab="Klausur 1", ylab="Klausur 2", gro
                 })
 @
 \begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-admissionDataGLM}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-sigmoidFunction}
+    \caption{Logistische Funktion}
+    \label{fig:Logitfunction}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-admissionDataGLM}
     \caption{Entscheidungsgrenze für Zulassung von Studenten, basierend auf Klausurnoten}
     \label{fig:DecisionBoundary}
+\end{minipage}
 \end{figure}
 
 Aus den Koeffizienzen lässt sich dann eine Entscheidungsgrenze berechnen. Da $\theta^Tx>0 \Leftrightarrow y=1$ lässt sich als Entscheidungsgrenze eine n-1 dimensionale Hyperebene berechnen. Sie teilt den Raum der erklärenden Variablen in zwei Halbräume, die jeweils eine Kategorie von $y$ repräsentieren. \footnote{Beispiel mit zwei erklärenden Variablen $x_1$ und $x_2$ (Abbildung \ref{fig:DecisionBoundary}):
@@ -264,11 +273,6 @@ Sucht man nun das Maximum dieser Funktion \cite[Kapitel 9.3.1]{fahrmeir} jeweils
 Die Anwendung der Maximum Likelihood auf das Regressionsproblem erfordert folgende Annahme über die Verteilung der Zielvariable $y$ gegeben der erklärenden
 Merkmale und dem Parametervektor $\theta$. 
 Zielvariable $y$ ist normalverteilt, wobei der Erwartungswert der Hypothese entspricht. 
-\begin{figure}
-    \includegraphics[scale=0.4]{../BishopPic/regressionMLAssumption}
-    \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \cite[Figure 1.16]{bishop}}
-    \label{fig:regressionMLAssumption}
-\end{figure}
 Man findet nun die Hypothese, gemäß deren die Realisierung des Zielmerkmals möglichst wahrscheinlich ist.  (Abbildung \ref{fig:regressionMLAssumption}). 
 \[
 L(\theta) = p(y|x, \theta) = \mathcal{N}(h_\theta(x), \sigma_1)
@@ -311,10 +315,6 @@ Es kann allerdings vorkommen, dass $X^TX$ nicht invertierbar ist
 \Rightarrow \det(X^T)\det(X) = 0 \Rightarrow \det(X^TX) = 0 \,\, \text{(Produktsatz von Determinanten)}\\
 \Rightarrow X^TX$ nicht invertierbar}- häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
 
-\subsection{Gradientenverfahren}
-Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \cite[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
-Es findet das Minimum der Kostenfunktion dadurch, dass iterativ so lange in Richtung des Gefälles der Funktion abgestiegen wird, bis der Werteunterschied so gering ist, dass man sich sicher in der Nähe des Minimums befindet: \\
-
 <<plotCostFunction, fig=true, echo=false, include=false>>=
 J <- function(X, y, theta) {
     m <- length(y)
@@ -337,7 +337,7 @@ for(i in 1:200) {
 }
 myLevels <-c(0,5000, 1000000,5000000, 10000000000)
 costs <- matrix(log(c(costs), base=200), 200)
-par(cex.lab=1.7)
+par(cex.lab=1.8)
 theta1 <- theta1s
 theta2 <-theta2s
 palette(gray(seq(0,1.0,len=10))) #gray scales; print old palette
@@ -345,10 +345,23 @@ image(theta1, theta2, costs, col=palette(), axes=FALSE)
 contour(theta1, theta2, costs, add=TRUE, col="black")
 @
 \begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotCostFunction}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=4.8cm,width=5.8cm]{../BishopPic/regressionMLAssumption}
+    \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \cite[Figure 1.16]{bishop}}
+    \label{fig:regressionMLAssumption}
+\end{minipage}
+\qquad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotCostFunction}
     \caption{Kostenfunktion der Hauspreis Regression (Abbildung \ref{fig:PlotProfitData})}
     \label{fig:PlotCostFunction}
+\end{minipage}
 \end{figure}
+
+\subsection{Gradientenverfahren}
+Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \cite[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
+Es findet das Minimum der Kostenfunktion dadurch, dass iterativ so lange in Richtung des Gefälles der Funktion abgestiegen wird, bis der Werteunterschied so gering ist, dass man sich sicher in der Nähe des Minimums befindet: \\
+
 
 \vspace{0.5cm}
 repeat until convergence \{\\
@@ -371,7 +384,7 @@ Stattdessen ist folgende Kostenfunktion üblich:
 log1 <- function(x) {
     return(-log(x))
 }
-par(cex.lab=1.5)
+par(cex.lab=1.6)
 par(mfrow=c(1,1))
 plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
 #plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
@@ -380,20 +393,22 @@ plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
 log2 <- function(x) {
     return(-log(1 - x))
 }
-par(cex.lab=1.5)
+par(cex.lab=1.6)
 par(mfrow=c(1,1))
 plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
 @
 \begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-logFunction1}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-logFunction1}
     \caption{Logistische Kostenfunktion für $y=1$}
     \label{fig:logFunction1}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-logFunction2}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-logFunction2}
     \caption{Logistische Kostenfunktion für $y=0$}
     \label{fig:logFunction2}
+\end{minipage}
 \end{figure}
 
 \[
@@ -462,8 +477,8 @@ Diese Kostenfunktion ähnelt sehr der Kleinsten Quadrate Kostenfunktion, außer 
 das Modell überangepasst ist (Overfitting, Abbildung \ref{fig:plotOverfitting}),
 also die Trainingsdaten zwar sehr gut approximiert, aber für neue Daten schlechte Voraussagen gemacht werden, da der Einfluss einzelner erklärender Merkmale zu groß ist.  
 <<plotOverfitting, fig=true, echo=false, include=false>>=
-par(cex.lab=1.8)
-par(cex.axis=1.8)
+par(cex.lab=1.7)
+par(cex.axis=1.7)
 plot(profitData$price~profitData$house_size,Data,xlab="Hausgröße",ylab="Preis",xaxt="n",yaxt="n")
 profitData <- profitData[with(profitData, order(house_size)), ]
 model<-lm(price~house_size 
@@ -479,9 +494,12 @@ lines(
 #curve(sum(summary(model)$coefficients * c(1, x, x^2, x^3, x^4, x^5, x^6, x^7, x^8, x^9)), add=T) #5.097075e+07+-2.381713e+05*x+4.739686e+02*x^2,add=T)
 @
 \begin{figure}
+\centering
+\begin{minipage}[t]{0.5\textwidth}
     \includegraphics[scale=0.4]{ausarbeitung-plotOverfitting}
     \caption{Polynomielle Regression 10. Grades des Hauspreises ohne Regularisierung}
     \label{fig:plotOverfitting}
+\end{minipage}
 \end{figure}
 Es gibt eine handvoll von Regularisierungsverfahren, aber eine gängige Erweiterung wird \emph{Tikhonov Regularisierung} genannt. Angewandt auf die kleinste Quadrate Kostenfunktion bedeutet folgendes:
 \[
@@ -496,6 +514,7 @@ p(y|x,X,Y) = \int p(y|x,\theta)p(\theta|X,Y)d\theta
 \]
 Aus dieser Dichte lässt sich nun dasjenige $y$ mit der höchsten Wahrscheinlichkeit vorraussagen. 
 
+\newpage
 \section{Zusammenfassung}
 \begin{itemize}
 \item Ein Regressionsmodell verknüpft Zielvariable $y$ mit einer Funktion von erklärendem Merkmal $x$.
@@ -503,7 +522,7 @@ Aus dieser Dichte lässt sich nun dasjenige $y$ mit der höchsten Wahrscheinlich
 \item Kleinste Quadrate Kostenfunktion ergibt sich aus der Maximum Likelihood Parameterschätzung.
 \item Logistische Regression klassifiziert mittels Verbindungsfunktion.
 \item Bayes Regression nimmt eine a priori Verteilung der Koeffizienten $\theta$ an, wodurch sich Überanpassung teilweise vermeiden lässt.
-
+\end{itemize}
 \section{Anwendung: Titanic-Datensatz}
 Ein häufig angewandter Demonstrationsdatensatz für Klassifikationen ist eine Studie über das Sinken der Titanic \cite{titanicDataset}
 , in dem für 1309 Passagiere jeweils angegeben ist, ob er überlebt hat, sowie zusätzliche Informationen über den Passagier, 
@@ -546,8 +565,8 @@ testModel <- function() {
 @
 
 <<plotTitanicAge, echo=false, include=false, fig=true>>=
-par(cex.lab=1.8)
-par(cex.axis=1.8)
+par(cex.lab=1.6)
+par(cex.axis=1.6)
 plot(survived~age,data=titanicTrainData)
 @
 <<plotTitanicSex, echo=false, include=false, fig=true>>=
@@ -568,25 +587,10 @@ mosaic(survived~pclass, data=titanicTrainData, shade = TRUE,
        legend_width=unit(7, "lines"))
 
 @
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotTitanicClass}
-    \caption{Mosaikplot Überleben gegeben Beförderungsklasse}
-    \label{fig:PlotSurvivalClass}
-\end{figure}
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotTitanicSex}
-    \caption{Mosaikplot Überleben gegeben Geschlecht}
-    \label{fig:PlotSurvivalSex}
-\end{figure}
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotTitanicAge}
-    \caption{Mosaikplot Überleben gegeben Alter}
-    \label{fig:PlotSurvivalAge}
-\end{figure}
-
 <<printTitanicData,echo=false>>=
 head(titanicTrainData)
 @
+
 Die Untersuchung des Datensatzes ist historisch motiviert und kann Aufschluss über soziale Struktur der damaligen Gesellschaft und den ungefähren Ablauf der Katastrophe geben. 
 Anhand der Abbildungen \ref{fig:PlotSurvivalClass}, \ref{fig:PlotSurvivalSex} und \ref{fig:PlotSurvivalAge} kann man erkennen, dass Passagiere mit hohem ökonomischer Status , Frauen und Kinder eher überlebt haben. Mit diesen drei erklärenden Variablen werden nun im Folgenden
 mithilfe der Open Source Statistik Software R \cite{R} eine logistische Regression durchgeführt.
@@ -600,6 +604,27 @@ Der Ausdruck liest sich folgendermaßen: In der Variable model wird das logistis
 Die Zielvariable survived soll anhand einer linearen Kombination der erklärenden Merkmale \texttt{age}, \texttt{sex} und \texttt{pclass} dargestellt werden. Da \texttt{sex} und \texttt{pclass} Faktorvariablen sind, also nicht kontinuierlich, wird im Modell für jede Faktorstufe eine zusätzliche erklärende Variable eingeführt die 0 oder 1 sein kann, wobei 1 bedeutet, dass die Variable die Faktorstufe annimmt. 
 Dann können Koeffizienten für jede Faktorstufe ermittelt werden, wobei eine Faktorstufe als Standard angenommen wird. Zum Beispiel geht das Merkmal Geschlecht so in das Modell ein, dass nur im Fall `männlich' der zugehörige $\theta$-Wert addiert wird und der Fall `weiblich' als Standardfall angenommen wird.\\
 Der zweite Parameter gibt den Datensatz an und der dritte bestimmt, dass das glm (generalized linear model) die logit-Funktion als Verbindungsfunktion nutzen soll, damit die logistische Regression durchgeführt wird.
+
+\begin{figure}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[scale=0.4]{ausarbeitung-plotTitanicClass}
+    \caption{Mosaikplot Überleben gegeben Beförderungsklasse}
+    \label{fig:PlotSurvivalClass}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotTitanicSex}
+    \caption{Mosaikplot Überleben gegeben Geschlecht}
+    \label{fig:PlotSurvivalSex}
+\end{minipage}
+\begin{centering}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotTitanicAge}
+    \caption{Mosaikplot Überleben gegeben Alter}
+    \label{fig:PlotSurvivalAge}
+\end{minipage}
+\end{centering}
+\end{figure}
 
 Informationen über geschätzte Koeffizienten und Gütekriterien lassen sich mit dem Befehl summary() aufrufen. 
 \begin{small}
@@ -630,27 +655,28 @@ mosaic(survived~ sex + pclass, data=titanicTrainData,
     titanicTestPrediction = sapply(predict(model, type="response", newdata=titanicTestData,na.action=na.pass),threshold)
 
 @
-
 \begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotFamily}
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotFamily}
     \caption{Mosaikplot: Überleben gegeben Geschwister an Bord}
     \label{fig:PlotFamily}
-\end{figure}
-\begin{figure}
-    \includegraphics[scale=0.4]{ausarbeitung-plotSurvivedSexClass}
+\end{minipage}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotSurvivedSexClass}
     \caption{Mosaikplot: Überleben gegeben Geschlecht und Beförderungsklasse}
     \label{fig:PlotSurvivedSexClass}
+\end{minipage}
 \end{figure}
 
-<<analyseFirstModel,echo=true>>=
-cat(testModel())
+<<analyseFirstModel,echo=false>>=
+#cat(testModel())
 @
 <<analyseFirstModel,echo=false>>=
-cat("Testdaten: 76.07% korrekte Vorhersagen")
+#cat("Testdaten: 76.07% korrekte Vorhersagen")
 @
-Diese Präzision auf dem Testdatensatz lässt darauf schließen, dass die drei bisherigen Variablen einen Großteil der Daten erklären.
-
-
+Zusätzlich liefert das Modell auf dem Trainingsdatensatz eine Präzision von etwa $78.89\%$ und auf dem Testdatensatz $76.07\%$ korrekte Vorhersagen.
+Der Wert des Testdatensatzes lässt darauf schließen, dass die drei bisherigen Variablen einen Großteil der Daten erklären.
 
 Zur Verbesserung des Modells werden wir den Datensatz noch etwas genauer anschauen. 
 In Abbildung \ref{fig:PlotSurvivalAge} erkennt man, dass die Beziehung zwischen Alter und Überleben nicht linear ist, sondern eher logarithmisch oder polynomiell. 
@@ -658,31 +684,64 @@ Abbildung \ref{fig:PlotFamily} zeigt, dass Personen mit Geschwistern an Bord ehe
 Desweiteren sieht man in Abbildung \ref{fig:PlotSurvivedSexClass}, dass eine Interaktion zwischen Geschlecht und Beförderungsklasse vorliegt, beispielsweise haben Frauen in der zweiten Klasse im Gegensatz zu Männern ähnlich häufig überlebt wie in der ersten Klasse.
 Diese Erkenntnisse sollen nun in das Modell einfließen.
 
-<<LogAgeModel,echo=false>>=
+<<LogAgeModel,echo=true>>=
 model <- glm(survived ~ I(log(age)) + pclass:sex + sibsp,
              data=titanicTrainData, 
              family=binomial("logit"))
 @
-
-
-
+Der Interaktionsterm wird durch einen Doppelpunkt spezifiziert und bewirkt, dass für jede Kombination von Geschlecht und Beförderungsklasse ein Koeffizient geschätzt wird der auf die log-Odds addiert wird, wenn die Kombination zutrifft. 
 \begin{small}
 <<analyseLogAgeModel,echo=false>>=
-summary(model)
+#summary(model)
 @
 \end{small}
-Der Interaktionsterm wird durch einen Doppelpunkt spezifiziert und bewirkt, dass für jede Kombination von Geschlecht und Beförderungsklasse ein Koeffizient geschätzt wird der auf die log-Odds addiert wird, wenn die Kombination zutrifft. 
-Fast alle unabhängigen Variablen sind signifikant\footnote{\texttt{NA} bedeutet not available, warum die Koeffizienten nicht ermittelt werden können ist mir noch nicht bekannt.}, die Residual deviance hat sich stark verkleinert, ebenso wie der AIC.
-Die Funktion drop1 berechnet Residual deviance und AIC wenn jeweils eine Variable fehlt.
-<<analyseLogAgeModel,echo=true>>=
-drop1(model)
+\begin{table}
+\centering
+\begin{tabular}{l||c|r}
+  Coefficient & Estimate & Probability \\
+  \hline
+  Intercept & 1.7 & 0.0018 \\
+  I(log(age))& -1.06 & 1.5e-10 \\
+  sibsp & -0.54 & 6.68e-05 \\
+  pclass1:sexfemale & 5.69 & <2e-16 \\
+  pclass2:sexfemale & 4.54 & <2e-16 \\
+  pclass3:sexfemale & 1.53 & 6.25e-08 \\
+  pclass1:sexmale & 1.87 & 2.07e-10 \\
+  pclass2:sexmale & -0.13 & 0.72 \\
+  pclass3:sexmale & NA & NA \\
+ \end{tabular}
+ \vspace*{0.5cm}
+ \caption{Estimated coefficient for the non-linear model with interactions.}
+ \label{table:advancedCoefficients}
+\end{table}
+\vspace*{-0.5cm}
+Tabelle \ref{table:advancedCoefficients} stellt die geschätzten Parameter dar.
+Alle unabhängigen Variablen außer \texttt{pclass2:sexmale} und \texttt{pclass3:sexmale} sind signifikant\footnote{\texttt{NA} bedeutet not available, warum die Koeffizienten nicht ermittelt werden können ist mir noch nicht bekannt.}, die Residual deviance hat sich auf 586 verkleinert, ebenso wie der AIC auf 602.
+<<analyseLogAgeModel,echo=false>>=
+#drop1(model)
 @
-Man erkennt, dass das Modell ohne die Interaktion von Geschlecht und Beförderungsklasse am schlechtesten abschneidet, aber auch die beiden anderen erklärenden Variablen senken die Kriterien, wenn sie nicht fehlen. 
-<<analyseLogAgeModel,echo=true>>=
-cat(testModel())
+\begin{table}
+\centering
+\begin{tabular}{l||c|r}
+  Variable & Deviance & AIC \\
+  \hline
+  <none> & 586 & 602\\
+  I(log(age))& 640 & 654\\
+  sibsp & 605& 619\\
+  pclass:sex & 949& 955\\
+ \end{tabular}
+ \vspace*{0.5cm}
+ \caption{In Tabelle ist Residual deviance und AIC berechnet, wenn jeweils eine Variable fehlt.}
+ \label{table:advancedDrop}
+\end{table}
+\vspace*{-0.5cm}
+Man erkennt aus Tabelle \ref{table:advancedDrop}, dass das Modell ohne die Interaktion von Geschlecht und Beförderungsklasse am schlechtesten abschneidet, aber auch die beiden anderen erklärenden Variablen senken die Kriterien, wenn sie nicht fehlen. 
+Des Weiteren liefert das Modell auf den Trainingsdaten $81.51\%$ und auf dem Testdatensatz $74.6\%$ korrekte Vorhersagen.
+<<analyseLogAgeModel,echo=false>>=
+#cat(testModel())
 @
 <<analyseLogAgeModel,echo=false>>=
-cat("Testdaten: 74.6% korrekte Vorhersagen")
+#cat("Testdaten: 74.6% korrekte Vorhersagen")
 @
 
 %precision recall?
@@ -691,8 +750,6 @@ Allerdings ist auch das Modell nicht zufriedenstellend.
 Denn eine sehr naive Klassifikation, bei der Frauen immer überleben und Männer nie überleben hat eine höhere Präzision, nämlich $76,5\%$. \footnote{\url{https://www.kaggle.com/c/titanic-gettingStarted/leaderboard}}
 Random forests erzielen eine Genauigkeit von $77.5\%$
 Eine Erklärung für das schlechte Abschneiden der logistischen Regression in diesem Vergleich könnte darin liegen, dass auch schon das erste, einfachere Modell überangepasst und deshalb das Naive Modell besser war. Auch scheint Regression generell nicht sehr gut mit faktoriellen erklärenden Variablen zurecht zu kommen, da lediglich der Achsenabschnitt verändert wird, komplexere Interaktionen aber nicht berücksichtigt werden, die beispielsweise Entscheidungsbäume im Allgemeinen besser modellieren. 
-
-\end{itemize}
 
 %\printbibliography
 
