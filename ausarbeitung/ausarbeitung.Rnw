@@ -4,6 +4,7 @@
 \usepackage{amssymb}
 \setcounter{tocdepth}{3}
 \usepackage{graphicx}
+\usepackage{alltt}
 \usepackage[utf8]{inputenc}
 
 %load packages
@@ -17,6 +18,9 @@
 %\renewcommand\LARGE{\@setfontsize\LARGE\@xxpt{23}}
 %\renewcommand\huge{\@setfontsize\huge\@xxvpt{25}}
 %\makeatother% restores meaning of @
+
+%bullet points
+\renewcommand{\labelitemi}{$\bullet$}
 
 %R options
 \fvset{listparameters={\setlength{\topsep}{0pt}}}
@@ -147,7 +151,7 @@ lines(Data$x, predict(model))
 \subsection{Logistische Regression}
 Falls es sich um ein Klassifikationsproblem handelt, das Zielmerkmal also nicht metrisch ist sondern nur abgrenzbare Kategorien annehmen kann, wendet man logistische Regression an. Im folgenden werden wir uns auf zwei Kategorien beschränken.
 Man nehme an, dass $y\in\{0,1\}$ und die Kategorien jeweils 0 und 1 entsprechen. 
-Wenn die erklärenden Variablen $x$ vorliegen folgt die abhangige Variable $y$ dann einer Bernoulli Verteilung, die mit der Wahrscheinlichkeit für Kategorie 1 ('Erfolg') $p$ parameterisiert ist.
+Wenn die erklärenden Variablen $x$ vorliegen folgt die abhangige Variable $y$ dann einer Bernoulli Verteilung, die mit der Wahrscheinlichkeit $p$ für Kategorie 1 ('Erfolg') parametrisiert ist.
 \begin{align*}
 y&\in\left\{{0,1}\right\}\\
 y|x &\sim Bernoulli(p)
@@ -311,7 +315,7 @@ der Parametervektor direkt berechnen lässt \cite[Ch. 3.1.1]{bishop}.
 \end{align*}
 $X^{+}$ bezeichnet hier die \emph{Moore-Penrose Pseudoinverse} von $X$, die das Konzept von Invertierbarkeit auf nichtquadratische Matrizen erweitert und allgemein zum Berechnen von optimalen Lösungen mit kleinster euklidischer Norm bei linearen Ausgleichsproblemen verwendet wird.
 Es kann allerdings vorkommen, dass $X^TX$ nicht invertierbar ist
-\footnote{Beweis:\\Spaltenvektoren von $X$ abhängig $\Rightarrow \det(X)=0 \\
+\footnote{Beweis:\\Spaltenvektoren von $X$ linear abhängig $\Rightarrow \det(X)=0 \\
 \Rightarrow \det(X^T)\det(X) = 0 \Rightarrow \det(X^TX) = 0 \,\, \text{(Produktsatz von Determinanten)}\\
 \Rightarrow X^TX$ nicht invertierbar}- häufig aufgrund redundanter erklärende Merkmale, also solche die nicht linear unabhängig von anderen sind, oder wenn es mehr Merkmale als Datenpunkte gibt ($m < n$).
 
@@ -346,7 +350,7 @@ contour(theta1, theta2, costs, add=TRUE, col="black")
 @
 \begin{figure}
 \begin{minipage}[t]{0.5\textwidth}
-    \includegraphics[height=4.8cm,width=5.8cm]{../BishopPic/regressionMLAssumption}
+    \includegraphics[height=4.8cm,width=6.0cm]{../BishopPic/regressionMLAssumption}
     \caption{Annahme für die Maximum Likelihood Schätzung bei der Regression. Grafik verändert aus \cite[Figure 1.16]{bishop}}
     \label{fig:regressionMLAssumption}
 \end{minipage}
@@ -361,13 +365,11 @@ contour(theta1, theta2, costs, add=TRUE, col="black")
 \subsection{Gradientenverfahren}
 Da die Matrix $X^TX$ eine $nxn$ Matrix ist und die Invertierung einer Matrix eine asymptotisch untere Schranke von $\Omega(n^2)$ (Strassen's Algorithmus $O(n^{2.81})$, siehe \cite[S. 827]{CormenLeiserson}) hat, wird die analytischen Lösung auf Probleme mit vielen erklärenden Merkmalen nicht angewandt, sondern das meist wesentlich schnellere Verfahren des Gradientenabstiegs. 
 Es findet das Minimum der Kostenfunktion dadurch, dass iterativ so lange in Richtung des Gefälles der Funktion abgestiegen wird, bis der Werteunterschied so gering ist, dass man sich sicher in der Nähe des Minimums befindet: \\
-
-
-\vspace{0.5cm}
+\begin{alltt}
 repeat until convergence \{\\
-\hspace{5mm}    $\theta_j := \theta_j - \alpha\frac{\partial}{\partial\theta_j}J(\theta)$\\
+    \(\theta_j := \theta_j - \alpha\frac{\partial}{\partial\theta_j}J(\theta)\)\\
 \}\\
-\vspace{0.5cm}
+\end{alltt}
 Die Parameter $\theta_j$ sind anfangs zufällig initialisiert.
 Wichtig ist die Wahl der Lernrate $\alpha$, die bestimmt wie weit in der Funktion gesprungen wird. 
 Falls nämlich $\alpha$ zu groß gewählt wurde, so kann es sein, dass der Algorithmus systematisch das Minimum überspringt und der Algorithmus daher nicht konvergiert.
@@ -384,7 +386,8 @@ Stattdessen ist folgende Kostenfunktion üblich:
 log1 <- function(x) {
     return(-log(x))
 }
-par(cex.lab=1.6)
+par(cex=1.8)
+par(cex.lab=1.2)
 par(mfrow=c(1,1))
 plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
 #plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
@@ -393,7 +396,8 @@ plot(log1, xlim=c(0,1), xlab="h(x)", ylab="-log(h(x)")
 log2 <- function(x) {
     return(-log(1 - x))
 }
-par(cex.lab=1.6)
+par(cex=1.8)
+par(cex.lab=1.2)
 par(mfrow=c(1,1))
 plot(log2, xlim=c(0,1), xlab="h(x)", ylab="-log(1-h(x))")
 @
@@ -603,7 +607,21 @@ model <- glm(survived ~ age + sex + I(pclass==1)
 Der Ausdruck liest sich folgendermaßen: In der Variable model wird das logistische Regressionsmodell gespeichert, dass mit der Funktion \texttt{glm} erzeugt wird. Der erste Parameter spezifiziert folgende \texttt{formula}:\\ 
 Die Zielvariable survived soll anhand einer linearen Kombination der erklärenden Merkmale \texttt{age}, \texttt{sex} und \texttt{pclass} dargestellt werden. Da \texttt{sex} und \texttt{pclass} Faktorvariablen sind, also nicht kontinuierlich, wird im Modell für jede Faktorstufe eine zusätzliche erklärende Variable eingeführt die 0 oder 1 sein kann, wobei 1 bedeutet, dass die Variable die Faktorstufe annimmt. 
 Dann können Koeffizienten für jede Faktorstufe ermittelt werden, wobei eine Faktorstufe als Standard angenommen wird. Zum Beispiel geht das Merkmal Geschlecht so in das Modell ein, dass nur im Fall `männlich' der zugehörige $\theta$-Wert addiert wird und der Fall `weiblich' als Standardfall angenommen wird.\\
-Der zweite Parameter gibt den Datensatz an und der dritte bestimmt, dass das glm (generalized linear model) die logit-Funktion als Verbindungsfunktion nutzen soll, damit die logistische Regression durchgeführt wird.
+Der zweite Parameter gibt den Datensatz an und der dritte bestimmt, dass das glm (generalized linear model) die logit-Funktion als Verbindungsfunktion nutzen soll, damit die logistische Regression durchgeführt wird
+
+
+<<displayTitanicAgeEffect, echo=false, include=false, fig=true>>=
+par(cex=1.7)
+ageModel <- glm(survived ~ age ,data=titanicTrainData, 
+             family=binomial("logit"))
+plot(titanicTrainData$age,as.numeric(titanicTrainData$survived) -rep(1,nrow(titanicTrainTest)), xlab="Alter",
+     ylab="Überlebenswahrscheinlichkeit")
+pred <- data.frame(1:891)
+pred$x <- titanicTrainData$age
+pred$y <- predict(ageModel, type="response", newdata=titanicTrainData,na.action=na.pass)
+pred <- na.omit(pred)
+lines(pred$x, pred$y, type="l")
+@
 
 \begin{figure}
 \begin{minipage}[t]{0.5\textwidth}
@@ -617,13 +635,18 @@ Der zweite Parameter gibt den Datensatz an und der dritte bestimmt, dass das glm
     \caption{Mosaikplot Überleben gegeben Geschlecht}
     \label{fig:PlotSurvivalSex}
 \end{minipage}
-\begin{centering}
 \begin{minipage}[t]{0.5\textwidth}
     \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-plotTitanicAge}
     \caption{Mosaikplot Überleben gegeben Alter}
     \label{fig:PlotSurvivalAge}
 \end{minipage}
-\end{centering}
+\quad
+\begin{minipage}[t]{0.5\textwidth}
+    \includegraphics[height=5.2cm,width=5.2cm]{ausarbeitung-displayTitanicAgeEffect}
+    \caption{Einfluss des Alters auf Überlebenswahrscheinlichkeit in einem logistischen Modell mit Alter als einzigem Prädiktor.}
+    \label{fig:displayTitanicAgeEffect}
+\end{minipage}
+
 \end{figure}
 
 Informationen über geschätzte Koeffizienten und Gütekriterien lassen sich mit dem Befehl summary() aufrufen. 
@@ -714,7 +737,6 @@ Der Interaktionsterm wird durch einen Doppelpunkt spezifiziert und bewirkt, dass
  \caption{Estimated coefficient for the non-linear model with interactions.}
  \label{table:advancedCoefficients}
 \end{table}
-\vspace*{-0.5cm}
 Tabelle \ref{table:advancedCoefficients} stellt die geschätzten Parameter dar.
 Alle unabhängigen Variablen außer \texttt{pclass2:sexmale} und \texttt{pclass3:sexmale} sind signifikant\footnote{\texttt{NA} bedeutet not available, warum die Koeffizienten nicht ermittelt werden können ist mir noch nicht bekannt.}, die Residual deviance hat sich auf 586 verkleinert, ebenso wie der AIC auf 602.
 <<analyseLogAgeModel,echo=false>>=
@@ -754,7 +776,7 @@ Eine Erklärung für das schlechte Abschneiden der logistischen Regression in di
 %\printbibliography
 
 
-\bibliographystyle{abbrvnat}
+\bibliographystyle{abbrv}
 \bibliography{../regressionLib}
 \nocite{*}
 
